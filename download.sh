@@ -9,6 +9,11 @@ URL_MAKE_TEMPLATE="https://raw.githubusercontent.com/Dr1xam/Rocket.vm/refs/heads
 URL_PART_A="https://github.com/Dr1xam/Rocket.vm/releases/download/v1.0/part_aa"
 URL_PART_B="https://github.com/Dr1xam/Rocket.vm/releases/download/v1.0/part_ab"
 
+echo "Завантаження конфігурацій..."
+wget -q --show-progress "$URL_CONFIG"
+
+source config
+
 echo "Завантаження частин..."
 # -q --show-progress показує красиву смужку завантаження
 wget -q --show-progress -O part_aa "$URL_PART_A"
@@ -27,11 +32,7 @@ cat part_* > "$FINAL_FILE"
 echo "Прибирання сміття (видалення частин)..."
 rm part_*
 
-wget -q --show-progress "$URL_CONFIG"
-
-
 wget -q --show-progress "$URL_MAKE_TEMPLATE"
-
 
 #інсталтор в останю чергу
 wget -q --show-progress "$URL_INSTALL"
