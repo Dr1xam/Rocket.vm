@@ -1,6 +1,6 @@
 #!/bin/bash
 # Посилання на шматки
-URL_Config="https://raw.githubusercontent.com/Dr1xam/Rocket.vm/refs/heads/main/config"
+URL_CONFIG="https://raw.githubusercontent.com/Dr1xam/Rocket.vm/refs/heads/main/config"
 
 URL_INSTALL="https://raw.githubusercontent.com/Dr1xam/Rocket.vm/refs/heads/main/install.sh"
 
@@ -27,7 +27,7 @@ cat part_* > "$FINAL_FILE"
 echo "Прибирання сміття (видалення частин)..."
 rm part_*
 
-wget -q --show-progress "$URL_ENV"
+wget -q --show-progress "$URL_CONFIG"
 
 
 wget -q --show-progress "$URL_MAKE_TEMPLATE"
