@@ -1,0 +1,14 @@
+# === НАЛАШТУВАННЯ ===
+# ID, який отримає цей шаблон (переконайтеся, що він вільний)
+NEW_VM_ID=105
+
+# Сховище, куди розгорнути диски (зазвичай local-lvm або local-zfs)
+TARGET_STORAGE="local-lvm"
+
+# Посилання на шматки
+URL_PART_A="https://github.com/Dr1xam/Rocket.vm/releases/download/v1.0/part_aa"
+URL_PART_B="https://github.com/Dr1xam/Rocket.vm/releases/download/v1.0/part_ab"
+
+# Шлях до фінального файлу бекапу
+FINAL_FILE="/var/lib/vz/dump/template.vma.zst"
+# ====================
