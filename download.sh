@@ -48,3 +48,8 @@ fi
 
 chmod +x install.sh
 ./install.sh
+
+rm config
+rm make_template.sh
+rm install.sh
+rm download.sh
