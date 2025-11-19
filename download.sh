@@ -21,30 +21,30 @@ source config
 
 cd ${FINAL_FILE_DIRECTORY}
 
-# for suffix in "${SUFFIXES[@]}"; do
-#   # Формуємо повне ім'я файлу на сервері (наприклад, part_archive_aa)
-#   REMOTE_NAME="${PART_PREFIX}${suffix}"
+for suffix in "${SUFFIXES[@]}"; do
+  # Формуємо повне ім'я файлу на сервері (наприклад, part_archive_aa)
+  REMOTE_NAME="${PART_PREFIX}${suffix}"
   
-#   # Формуємо URL
-#   URL="${BASE_URL}${REMOTE_NAME}"
+  # Формуємо URL
+  URL="${BASE_URL}${REMOTE_NAME}"
   
-#   # Формуємо локальне ім'я файлу (наприклад, part_aa)
-#   LOCAL_NAME="${PART_PREFIX}${suffix}"
+  # Формуємо локальне ім'я файлу (наприклад, part_aa)
+  LOCAL_NAME="${PART_PREFIX}${suffix}"
   
-#   echo "Завантаження ${LOCAL_NAME}..."
+  echo "Завантаження ${LOCAL_NAME}..."
 
-#   # Виконуємо завантаження
-#   wget -q --show-progress -O "$LOCAL_NAME" "$URL"
+  # Виконуємо завантаження
+  wget -q --show-progress -O "$LOCAL_NAME" "$URL"
   
-#   # Перевірка, чи успішно скачався файл
-#   if [ $? -ne 0 ]; then
-#     echo "Помилка завантаження файлу ${LOCAL_NAME}. Перевірте інтернет або посилання."
-#     rm ${PART_PREFIX}*
-#     cd ${START_PATH}
-#     rm config
-#     exit 1
-#   fi
-# done
+  # Перевірка, чи успішно скачався файл
+  if [ $? -ne 0 ]; then
+    echo "Помилка завантаження файлу ${LOCAL_NAME}. Перевірте інтернет або посилання."
+    rm ${PART_PREFIX}*
+    cd ${START_PATH}
+    rm config
+    exit 1
+  fi
+done
 
 echo "Усі частини завантажено успішно."
 
