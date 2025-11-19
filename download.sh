@@ -38,6 +38,7 @@ for suffix in "${SUFFIXES[@]}"; do
   if [ $? -ne 0 ]; then
     echo "Помилка завантаження файлу ${LOCAL_NAME}. Перевірте інтернет або посилання."
     rm ${PART_PREFIX}*
+    rm config
     exit 1
   fi
 done
