@@ -65,7 +65,7 @@ else
   exit 1
 fi
 
-rm ${PART_PREFIX}*
+#rm ${PART_PREFIX}*
 
 cd ${START_PATH}
 wget -q --show-progress "$URL_MAKE_TEMPLATE"
