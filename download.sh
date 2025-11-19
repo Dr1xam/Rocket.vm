@@ -19,6 +19,8 @@ wget -q --show-progress "$URL_CONFIG"
 
 source config
 
+cd ${FINAL_FILE_DIRECTORY}
+
 for suffix in "${SUFFIXES[@]}"; do
   # Формуємо повне ім'я файлу на сервері (наприклад, part_archive_aa)
   REMOTE_NAME="${PART_PREFIX}${suffix}"
@@ -38,6 +40,7 @@ for suffix in "${SUFFIXES[@]}"; do
   if [ $? -ne 0 ]; then
     echo "Помилка завантаження файлу ${LOCAL_NAME}. Перевірте інтернет або посилання."
     rm ${PART_PREFIX}*
+    cd ${START_PATH}
     rm config
     exit 1
   fi
@@ -50,21 +53,21 @@ echo "Усі частини завантажено успішно."
 echo "Склеювання частин у файл: ${FINAL_FILE_NAME}..."
 
 # cat part_archive_a* склеїть їх у правильному алфавітному порядку (aa, ab, ac, ...)
-cd ${FINAL_FILE_DIRECTORY}
 cat ${PART_PREFIX}* > "$FINAL_FILE_NAME"
 
 if [ $? -eq 0 ]; then
   echo "Склеювання завершено. Файл ${FINAL_FILE_NAME} готовий."
 else
   echo "Помилка під час склеювання файлів."
-  cd ${START_PATH}
   rm ${PART_PREFIX}*
+  cd ${START_PATH}
+  rm config
   exit 1
 fi
 
-cd ${START_PATH}
 rm ${PART_PREFIX}*
 
+cd ${START_PATH}
 wget -q --show-progress "$URL_MAKE_TEMPLATE"
 
 #інсталтор в останю чергу
