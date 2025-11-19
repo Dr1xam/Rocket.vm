@@ -9,4 +9,7 @@ TARGET_STORAGE="local-lvm"
 FINAL_FILE_NAME="template.vma.zst"
 FINAL_FILE_DIRECTORY="/var/lib/vz/dump"
 FINAL_FILE_PATH="${FINAL_FILE_DIRECTORY}/${FINAL_FILE_NAME}"
+
+# початкова директорія 
+START_PATH=$PWD
 # ====================
