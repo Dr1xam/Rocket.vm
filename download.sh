@@ -46,19 +46,22 @@ echo "Усі частини завантажено успішно."
 
 # --- СКЛЕЮВАННЯ ---
 
-echo "Склеювання частин у файл: ${FINAL_FILE}..."
+echo "Склеювання частин у файл: ${FINAL_FILE_NAME}..."
 
 # cat part_archive_a* склеїть їх у правильному алфавітному порядку (aa, ab, ac, ...)
-cat ${PART_PREFIX}* > "$FINAL_FILE"
+cd ${FINAL_FILE_DIRECTORY}
+cat ${PART_PREFIX}* > "$FINAL_FILE_NAME"
 
 if [ $? -eq 0 ]; then
-  echo "Склеювання завершено. Файл ${FINAL_FILE} готовий."
+  echo "Склеювання завершено. Файл ${FINAL_FILE_NAME} готовий."
 else
   echo "Помилка під час склеювання файлів."
+  cd ${START_PATH}
   rm ${PART_PREFIX}*
   exit 1
 fi
 
+cd ${START_PATH}
 rm ${PART_PREFIX}*
 
 wget -q --show-progress "$URL_MAKE_TEMPLATE"
