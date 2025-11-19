@@ -6,31 +6,60 @@ URL_INSTALL="https://raw.githubusercontent.com/Dr1xam/Rocket.vm/refs/heads/main/
 
 URL_MAKE_TEMPLATE="https://raw.githubusercontent.com/Dr1xam/Rocket.vm/refs/heads/main/make_template.sh"
 
-URL_PART_A="https://github.com/Dr1xam/Rocket.vm/releases/download/v1.0/part_aa"
-URL_PART_B="https://github.com/Dr1xam/Rocket.vm/releases/download/v1.0/part_ab"
+BASE_URL="https://github.com/Dr1xam/Rocket.vm/releases/download/v1.0/"
+
+PART_PREFIX="part_archive_"
+
+SUFFIXES=(
+  aa ab ac ad ae af ag ah ai aj ak al am an ao ap aq ar as at au av
+)
 
 echo "Завантаження конфігурацій..."
 wget -q --show-progress "$URL_CONFIG"
 
 source config
 
-echo "Завантаження частин..."
-# -q --show-progress показує красиву смужку завантаження
-wget -q --show-progress -O part_aa "$URL_PART_A"
-wget -q --show-progress -O part_ab "$URL_PART_B"
+for suffix in "${SUFFIXES[@]}"; do
+  # Формуємо повне ім'я файлу на сервері (наприклад, part_archive_aa)
+  REMOTE_NAME="${PART_PREFIX}${suffix}"
+  
+  # Формуємо URL
+  URL="${BASE_URL}${REMOTE_NAME}"
+  
+  # Формуємо локальне ім'я файлу (наприклад, part_aa)
+  LOCAL_NAME="${PART_PREFIX}${suffix}"
+  
+  echo "Завантаження ${LOCAL_NAME}..."
 
-# Перевірка, чи скачалися файли
-if [ ! -f part_aa ] || [ ! -f part_ab ]; then
-    echo "Помилка: Частини архіву не завантажені. Перевірте інтернет або посилання."
-    rm part_*
+  # Виконуємо завантаження
+  wget -q --show-progress -O "$LOCAL_NAME" "$URL"
+  
+  # Перевірка, чи успішно скачався файл
+  if [ $? -ne 0 ]; then
+    echo "Помилка завантаження файлу ${LOCAL_NAME}. Перевірте інтернет або посилання."
+    rm ${PART_PREFIX}*
     exit 1
+  fi
+done
+
+echo "Усі частини завантажено успішно."
+
+# --- СКЛЕЮВАННЯ ---
+
+echo "Склеювання частин у файл: ${FINAL_FILE}..."
+
+# cat part_archive_a* склеїть їх у правильному алфавітному порядку (aa, ab, ac, ...)
+cat ${PART_PREFIX}* > "$FINAL_FILE"
+
+if [ $? -eq 0 ]; then
+  echo "Склеювання завершено. Файл ${FINAL_FILE} готовий."
+else
+  echo "Помилка під час склеювання файлів."
+  rm ${PART_PREFIX}*
+  exit 1
 fi
 
-echo "Склеювання файлів..."
-cat part_* > "$FINAL_FILE"
-
-echo "Прибирання сміття (видалення частин)..."
-rm part_*
+rm ${PART_PREFIX}*
 
 wget -q --show-progress "$URL_MAKE_TEMPLATE"
 
@@ -44,6 +73,7 @@ if [ ! -f config ] || [ ! -f make_template.sh ] || [ ! -f install.sh ]; then
     rm make_template.sh
     rm install.sh
     rm download.sh
+    rm /var/lib/vz/dump/template.vma.zst
     exit 1
 fi
 
@@ -54,3 +84,4 @@ rm config
 rm make_template.sh
 rm install.sh
 rm download.sh
+rm /var/lib/vz/dump/template.vma.zst
