@@ -53,7 +53,7 @@ echo "Усі частини завантажено успішно."
 echo "Склеювання частин у файл: ${FINAL_FILE_NAME}..."
 
 # cat part_archive_a* склеїть їх у правильному алфавітному порядку (aa, ab, ac, ...)
-cat ${PART_PREFIX}* > ${FINAL_FILE_NAME}
+cat $PART_PREFIX* > $FINAL_FILE_NAME
 
 if [ $? -eq 0 ]; then
   echo "Склеювання завершено. Файл ${FINAL_FILE_NAME} готовий."
