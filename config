@@ -6,7 +6,7 @@ NEW_VM_ID=105
 TARGET_STORAGE="local-lvm"
 
 # Шлях до фінального файлу бекапу
-FINAL_FILE_NAME="template.vma.zst"
+FINAL_FILE_NAME="vzdump-qemu-101.vma.zst"
 FINAL_FILE_DIRECTORY="/var/lib/vz/dump"
 FINAL_FILE_PATH="${FINAL_FILE_DIRECTORY}/${FINAL_FILE_NAME}"
 
