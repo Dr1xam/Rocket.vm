@@ -13,7 +13,7 @@ else
 fi
 
 # (Опційно) Видалити великий склеєний файл, щоб звільнити місце
-rm "$UBUNTU_BACKUP_TEMPLATE_NAME"
+#rm -f "$UBUNTU_BACKUP_TEMPLATE_NAME"
 
 echo "Готово! Ваш шаблон (ID: $NEW_VM_ID) створено і готовий до клонування."
 
