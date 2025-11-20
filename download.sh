@@ -6,7 +6,7 @@ URL_INSTALL="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads
 
 URL_MAKE_TEMPLATE="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/main/make_template.sh"
 
-BASE_URL="https://github.com/Dr1xam/deployment-tool/releases/download/v1.0/"
+URL_PARTS="https://github.com/Dr1xam/deployment-tool/releases/download/v1.0/"
 
 echo "Завантаження конфігурацій..."
 wget -q --show-progress "$URL_CONFIG"
@@ -17,18 +17,15 @@ cd ${FINAL_FILE_DIRECTORY}
 
 for suffix in "${SUFFIXES[@]}"; do
   # Формуємо повне ім'я файлу на сервері (наприклад, part_archive_aa)
-  REMOTE_NAME="${PART_PREFIX}${suffix}"
+  PART_NAME="${PART_PREFIX}${suffix}"
   
   # Формуємо URL
-  URL="${BASE_URL}${REMOTE_NAME}"
+  URL="${URL_PARTS}${PART_NAME}"
   
-  # Формуємо локальне ім'я файлу (наприклад, part_aa)
-  LOCAL_NAME="${PART_PREFIX}${suffix}"
-  
-  echo "Завантаження ${LOCAL_NAME}..."
+  echo "Завантаження ${PART_NAME}..."
 
   # Виконуємо завантаження
-  wget -q --show-progress -O "$LOCAL_NAME" "$URL"
+  wget -q --show-progress -O "$PART_NAME" "$URL"
   
   # Перевірка, чи успішно скачався файл
   if [ $? -ne 0 ]; then
