@@ -1,12 +1,12 @@
 #!/bin/bash
 # Посилання на шматки
-URL_CONFIG="https://raw.githubusercontent.com/Dr1xam/Rocket.vm/refs/heads/main/config"
+URL_CONFIG="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/main/config"
 
-URL_INSTALL="https://raw.githubusercontent.com/Dr1xam/Rocket.vm/refs/heads/main/install.sh"
+URL_INSTALL="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/main/install.sh"
 
-URL_MAKE_TEMPLATE="https://raw.githubusercontent.com/Dr1xam/Rocket.vm/refs/heads/main/make_template.sh"
+URL_MAKE_TEMPLATE="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/main/make_template.sh"
 
-BASE_URL="https://github.com/Dr1xam/Rocket.vm/releases/download/v1.0/"
+BASE_URL="https://github.com/Dr1xam/deployment-tool/releases/download/v1.0/"
 
 PART_PREFIX="part_archive_"
 
