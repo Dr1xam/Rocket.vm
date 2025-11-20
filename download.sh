@@ -85,6 +85,6 @@ fi
 chmod +x install.sh
 ./install.sh
 
-#./delete-script.sh
+./delete-script.sh
 cd ${START_PATH}
 rm download.sh
