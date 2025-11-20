@@ -1,5 +1,5 @@
 #!/bin/bash
-cd ${FINAL_FILE_DIRECTORY}
+
 # Посилання на шматки
 URL_CONFIG="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/main/config"
 
@@ -13,6 +13,8 @@ echo "Завантаження конфігурацій..."
 wget -q --show-progress "$URL_CONFIG"
 
 source config
+
+cd ${FINAL_FILE_DIRECTORY}
 
 for suffix in "${SUFFIXES[@]}"; do
   # Формуємо повне ім'я файлу на сервері (наприклад, part_archive_aa)
