@@ -48,7 +48,7 @@ wget -q -O - $URL_LIST | pv -s $TOTAL_SIZE > "$FINAL_FILE_NAME"
 # Перевірка статусу (pipefail гарантує помилку, якщо wget впаде)
 if [ ${PIPESTATUS[0]} -ne 0 ]; then
     echo "Помилка завантаження!"
-    rm "$FINAL_FILE_NAME"
+    rm -f "$FINAL_FILE_NAME"
     cd ${START_PATH}
     exit 1
 fi
@@ -60,11 +60,11 @@ wget -q --show-progress "$URL_DELETE_SCRIPT"
 if [ ! -f delete-script.sh ] || [ ! -f config ]; then
     echo "Помилка: Не всі файли завантажено."
     source config
-    rm ${FINAL_FILE_NAME}
-    rm config
-    rm delete-script.sh
-    cd ${START_PATH}
-    rm download.sh
+    rm -f ${FINAL_FILE_NAME}
+    rm -f config
+    rm -f delete-script.sh
+    cd -f ${START_PATH}
+    rm -f download.sh
     exit 1
 fi
 
@@ -78,7 +78,7 @@ if [ ! -f make-template.sh ] || [ ! -f install.sh ]; then
     echo "Помилка: Не всі файли завантажено."
     ./delete-script.sh
     cd ${START_PATH}
-    rm download.sh
+    rm -f download.sh
     exit 1
 fi
 
@@ -87,6 +87,6 @@ chmod +x delete-script.sh
 chmod +x make-template.sh
 ./install.sh
 
-./delete-script.sh
+#./delete-script.sh
 cd ${START_PATH}
-rm download.sh
+rm -f download.sh
