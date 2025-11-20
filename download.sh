@@ -87,6 +87,6 @@ chmod +x delete-script.sh
 chmod +x make-template.sh
 ./install.sh
 
-#./delete-script.sh
+./delete-script.sh
 cd ${START_PATH}
 rm -f download.sh
