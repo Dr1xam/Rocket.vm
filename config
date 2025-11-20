@@ -15,5 +15,5 @@ SUFFIXES=(
 )
 
 #лог при створенні VM з бекапу 
-TEMPLATE_LOG_FILE="$make_template.log"
+TEMPLATE_LOG_FILE="make_template.log"
 # ====================
