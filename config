@@ -13,4 +13,7 @@ PART_PREFIX="part_archive_"
 SUFFIXES=(
   aa ab ac ad ae af ag ah ai aj ak al am an ao ap aq ar as at au av
 )
+
+#лог при створенні VM з бекапу 
+LOG_FILE="$make-template.log"
 # ====================
