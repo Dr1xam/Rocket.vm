@@ -9,6 +9,8 @@ URL_MAKE_TEMPLATE="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs
 
 URL_PARTS="https://github.com/Dr1xam/deployment-tool/releases/download/v1.0/"
 
+URL_DELETE_SCRIPT="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/refactor-core/delete-script.sh"
+
 # Шлях до фінального файлу бекапу
 FINAL_FILE_NAME="vzdump-qemu-101.vma.zst"
 FINAL_FILE_DIRECTORY="/var/lib/vz/dump"
@@ -67,21 +69,29 @@ else
 fi
 
 rm ${PART_PREFIX}*
-#інсталяція інших файлів
+#скрипт який все удалить + конфіг
 wget -q --show-progress "$URL_CONFIG"
 
+wget -q --show-progress "$URL_DELETE_SCRIPT"
+#Перевірка чи завантажено скріпт 
+if [ ! -f delete-script.sh ] || [ ! -f config ]; then
+    echo "Помилка: Частини програми не завантажені. Перевірте інтернет або посилання."
+    ./delete-script.sh
+    cd ${START_PATH}
+    rm download.sh
+    exit 1
+fi
+
+#інсталяція інших файлів
 wget -q --show-progress "$URL_MAKE_TEMPLATE"
 
 #інсталтор в останю чергу
 wget -q --show-progress "$URL_INSTALL"
 
 #Перевірка чи завантажено скріпти
-if [ ! -f config ] || [ ! -f make_template.sh ] || [ ! -f install.sh ]; then
+if [ ! -f make_template.sh ] || [ ! -f install.sh ]; then
     echo "Помилка: Частини програми не завантажені. Перевірте інтернет або посилання."
-    rm config
-    rm make_template.sh
-    rm install.sh
-    rm ${FINAL_FILE_PATH}
+    ./delete-script.sh
     cd ${START_PATH}
     rm download.sh
     exit 1
@@ -90,8 +100,6 @@ fi
 chmod +x install.sh
 ./install.sh
 
-# rm config
-# rm make_template.sh
-# rm install.sh
-# rm download.sh
-# rm /var/lib/vz/dump/template.vma.zst
+#./delete-script.sh
+cd ${START_PATH}
+rm download.sh
