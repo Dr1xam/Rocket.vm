@@ -1,6 +1,6 @@
 source config
-rm make-template.sh
-rm install.sh
-rm ${UBUNTU_BACKUP_TEMPLATE_NAME}
-rm config
-rm delete-script.sh
+rm -f make-template.sh
+rm -f install.sh
+rm -f ${UBUNTU_BACKUP_TEMPLATE_NAME}
+rm -f config
+rm -f delete-script.sh
