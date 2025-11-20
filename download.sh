@@ -8,12 +8,6 @@ URL_MAKE_TEMPLATE="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs
 
 BASE_URL="https://github.com/Dr1xam/deployment-tool/releases/download/v1.0/"
 
-PART_PREFIX="part_archive_"
-
-SUFFIXES=(
-  aa ab ac ad ae af ag ah ai aj ak al am an ao ap aq ar as at au av
-)
-
 echo "Завантаження конфігурацій..."
 wget -q --show-progress "$URL_CONFIG"
 
