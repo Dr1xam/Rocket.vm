@@ -1,7 +1,6 @@
 source config
 
-echo "--- Початок відновлення: $(date) ---" > "$TEMPLATE_LOG_FILE"
-echo "Відновлення VM $NEW_VM_ID... (деталі пишуться в $LOG_FILE)"
+echo "Відновлення VM $NEW_VM_ID... (деталі пишуться в $TEMPLATE_LOG_FILE)"
 
 set -o pipefail
 
@@ -16,7 +15,7 @@ while IFS= read -r line; do
             ;;
         *)
             # ВСЕ ІНШЕ: у файл логу (>> додає рядок в кінець файлу)
-            echo "$line" >> "$LOG_FILE"
+            echo "$line" >> "$TEMPLATE_LOG_FILE"
             ;;
     esac
 done
@@ -24,13 +23,13 @@ done
 # Перевірка результату
 if [ $? -eq 0 ]; then
     echo -e "\n Відновлення завершено успішно."
-    echo "Лог записано у файл: $LOG_FILE"
+    echo "Лог записано у файл: $TEMPLATE_LOG_FILE"
 else
-    echo "Виводжу повний лог помилки ($LOG_FILE):"
+    echo "Виводжу повний лог помилки ($TEMPLATE_LOG_FILE):"
     echo "========================================================"
     
     # cat виведе весь файл від початку до кінця
-    cat "$LOG_FILE"
+    cat "$TEMPLATE_LOG_FILE"
     
     echo "========================================================"
     exit 1
