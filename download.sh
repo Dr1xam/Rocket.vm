@@ -3,7 +3,7 @@
 # Посилання 
 URL_CONFIG="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/main/config"
 URL_INSTALL="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/main/install.sh"
-URL_MAKE_TEMPLATE="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/main/make_template.sh"
+URL_MAKE_TEMPLATE="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/main/make-template.sh"
 URL_PARTS="https://github.com/Dr1xam/deployment-tool/releases/download/v1.0/"
 URL_DELETE_SCRIPT="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/refactor-core/delete-script.sh"
 
@@ -39,12 +39,10 @@ for suffix in "${SUFFIXES[@]}"; do
   URL_LIST="${URL_LIST} ${URL_PARTS}${PART_PREFIX}${suffix}"
 done
 
-echo "Початок завантаження архіву (єдиний потік)..."
+echo "Початок завантаження шаблону для віртуальних машин "
 
-# --- МАГІЯ ТУТ ---
-# 1. wget отримує список URL і качає їх по черзі в stdout (-O -)
-# 2. pv отримує дані, малює смужку (з розміром -s для відсотків)
-# 3. > пише все відразу у фінальний файл
+
+# Завантаження + Склеювання (однією смужкою)
 wget -q -O - $URL_LIST | pv -s $TOTAL_SIZE > "$FINAL_FILE_NAME"
 
 # Перевірка статусу (pipefail гарантує помилку, якщо wget впаде)
@@ -55,14 +53,16 @@ if [ ${PIPESTATUS[0]} -ne 0 ]; then
     exit 1
 fi
 
-echo "Завантаження та склеювання завершено успішно."
 #скрипт який все удалить + конфіг
 wget -q --show-progress "$URL_CONFIG"
 wget -q --show-progress "$URL_DELETE_SCRIPT"
 #Перевірка чи завантажено скріпт 
 if [ ! -f delete-script.sh ] || [ ! -f config ]; then
-    echo "Помилка: Частини програми не завантажені. Перевірте інтернет або посилання."
-    ./delete-script.sh
+    echo "Помилка: Не всі файли завантажено."
+    source config
+    rm ${FINAL_FILE_NAME}
+    rm config
+    rm delete-script.sh
     cd ${START_PATH}
     rm download.sh
     exit 1
@@ -74,8 +74,8 @@ wget -q --show-progress "$URL_MAKE_TEMPLATE"
 wget -q --show-progress "$URL_INSTALL"
 
 #Перевірка чи завантажено скріпти
-if [ ! -f make_template.sh ] || [ ! -f install.sh ]; then
-    echo "Помилка: Частини програми не завантажені. Перевірте інтернет або посилання."
+if [ ! -f make-template.sh ] || [ ! -f install.sh ]; then
+    echo "Помилка: Не всі файли завантажено."
     ./delete-script.sh
     cd ${START_PATH}
     rm download.sh
@@ -83,6 +83,8 @@ if [ ! -f make_template.sh ] || [ ! -f install.sh ]; then
 fi
 
 chmod +x install.sh
+chmod +x delete-script.sh
+chmod +x make-template.sh
 ./install.sh
 
 ./delete-script.sh
