@@ -5,10 +5,8 @@ NEW_VM_ID=105
 # Сховище, куди розгорнути диски (зазвичай local-lvm або local-zfs)
 TARGET_STORAGE="local-lvm"
 
-# Шлях до фінального файлу бекапу
-FINAL_FILE_NAME="vzdump-qemu-101.vma.zst"
-FINAL_FILE_DIRECTORY="/var/lib/vz/dump"
-FINAL_FILE_PATH="${FINAL_FILE_DIRECTORY}/${FINAL_FILE_NAME}"
+# Бекапи Шаблонів
+UBUNTU_BACKUP_TEMPLATE_NAME="vzdump-qemu-101.vma.zst"
 
 #Назви частин архіву з бекапом убунту сервера
 PART_PREFIX="part_archive_"
