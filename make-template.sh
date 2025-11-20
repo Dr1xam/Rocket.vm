@@ -1,30 +1,38 @@
 source config
 
-echo "Відновлення VM $NEW_VM_ID зі сховища $TARGET_STORAGE..."
+echo "--- Початок відновлення: $(date) ---" > "$TEMPLATE_LOG_FILE"
+echo "Відновлення VM $NEW_VM_ID... (деталі пишуться в $LOG_FILE)"
+
+set -o pipefail
+
 # qmrestore розпаковує архів у віртуальну машину
+# Запускаємо qmrestore
 qmrestore "$UBUNTU_BACKUP_TEMPLATE_NAME" "$NEW_VM_ID" --storage "$TARGET_STORAGE" --unique --force 2>&1 | \
 while IFS= read -r line; do
     case "$line" in
         *progress*)
-            # Якщо рядок містить "progress", виводимо його з поверненням курсору (\r)
-            # \033[K очищає кінець рядка від сміття
+            # ТІЛЬКИ НА ЕКРАН: гарна смужка
             echo -ne "\r$line\033[K"
             ;;
-        *ERROR*|*Error*|*fail*)
-             # (Опціонально) Якщо є помилка, виводимо її, щоб знати, що сталося
-             echo -e "\n$line"
-             ;;
         *)
-            # Усі інші рядки (CFG, WARNING, map, Logical volume...) ІГНОРУЄМО
+            # ВСЕ ІНШЕ: у файл логу (>> додає рядок в кінець файлу)
+            echo "$line" >> "$LOG_FILE"
             ;;
     esac
 done
 
-# Перевірка статусу
+# Перевірка результату
 if [ $? -eq 0 ]; then
     echo -e "\n Відновлення завершено успішно."
+    echo "Лог записано у файл: $LOG_FILE"
 else
-    echo -e "\n Помилка під час відновлення."
+    echo "Виводжу повний лог помилки ($LOG_FILE):"
+    echo "========================================================"
+    
+    # cat виведе весь файл від початку до кінця
+    cat "$LOG_FILE"
+    
+    echo "========================================================"
     exit 1
 fi
 
