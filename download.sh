@@ -9,10 +9,19 @@ URL_MAKE_TEMPLATE="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs
 
 URL_PARTS="https://github.com/Dr1xam/deployment-tool/releases/download/v1.0/"
 
-echo "Завантаження конфігурацій..."
-wget -q --show-progress "$URL_CONFIG"
+# Шлях до фінального файлу бекапу
+FINAL_FILE_NAME="vzdump-qemu-101.vma.zst"
+FINAL_FILE_DIRECTORY="/var/lib/vz/dump"
+FINAL_FILE_PATH="${FINAL_FILE_DIRECTORY}/${FINAL_FILE_NAME}"
 
-source config
+# початкова директорія 
+START_PATH=$PWD
+
+#Назви частин архіву з бекапом убунту сервера
+PART_PREFIX="part_archive_"
+SUFFIXES=(
+  aa ab ac ad ae af ag ah ai aj ak al am an ao ap aq ar as at au av
+)
 
 cd ${FINAL_FILE_DIRECTORY}
 
@@ -33,7 +42,7 @@ for suffix in "${SUFFIXES[@]}"; do
     echo "Помилка завантаження файлу ${LOCAL_NAME}. Перевірте інтернет або посилання."
     rm ${PART_PREFIX}*
     cd ${START_PATH}
-    rm config
+    rm download
     exit 1
   fi
 done
@@ -53,13 +62,14 @@ else
   echo "Помилка під час склеювання файлів."
   rm ${PART_PREFIX}*
   cd ${START_PATH}
-  rm config
+  rm download
   exit 1
 fi
 
 rm ${PART_PREFIX}*
 
-cd ${START_PATH}
+wget -q --show-progress "$URL_CONFIG"
+
 wget -q --show-progress "$URL_MAKE_TEMPLATE"
 
 #інсталтор в останю чергу
@@ -71,16 +81,17 @@ if [ ! -f config ] || [ ! -f make_template.sh ] || [ ! -f install.sh ]; then
     rm config
     rm make_template.sh
     rm install.sh
+    rm ${FINAL_FILE_PATH}
+    cd ${START_PATH}
     rm download.sh
-    rm /var/lib/vz/dump/template.vma.zst
     exit 1
 fi
 
 chmod +x install.sh
 ./install.sh
 
-rm config
-rm make_template.sh
-rm install.sh
-rm download.sh
-rm /var/lib/vz/dump/template.vma.zst
+# rm config
+# rm make_template.sh
+# rm install.sh
+# rm download.sh
+# rm /var/lib/vz/dump/template.vma.zst
