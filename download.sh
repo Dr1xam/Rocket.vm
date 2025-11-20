@@ -67,7 +67,7 @@ else
 fi
 
 rm ${PART_PREFIX}*
-
+#інсталяція інших файлів
 wget -q --show-progress "$URL_CONFIG"
 
 wget -q --show-progress "$URL_MAKE_TEMPLATE"
