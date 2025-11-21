@@ -1,12 +1,12 @@
-source install.conf
+source vm.conf
 
-echo "Відновлення VM $TEMPLATE_VM_ID... (деталі пишуться в $TEMPLATE_LOG_FILE)"
+echo "Відновлення VM $TEMPLATE_VM_ID... (деталі пишуться в $MAKE_TEMPLATE_LOG_FILE)"
 
 set -o pipefail
 
 # qmrestore розпаковує архів у віртуальну машину
 # Запускаємо qmrestore
-qmrestore "$UBUNTU_BACKUP_TEMPLATE_NAME" "$TEMPLATE_VM_ID" --storage "$TARGET_STORAGE" --unique --force 2>&1 | \
+qmrestore "$UBUNTU_BACKUP_TEMPLATE_NAME" "$TEMPLATE_VM_ID" --storage "$VM_TARGET_STORAGE" --unique --force 2>&1 | \
 while IFS= read -r line; do
     case "$line" in
         *progress*)
@@ -15,7 +15,7 @@ while IFS= read -r line; do
             ;;
         *)
             # ВСЕ ІНШЕ: у файл логу (>> додає рядок в кінець файлу)
-            echo "$line" >> "$TEMPLATE_LOG_FILE"
+            echo "$line" >> "$MAKE_TEMPLATE_LOG_FILE"
             ;;
     esac
 done
@@ -24,13 +24,13 @@ done
 # Перевірка результату
 if [ $? -eq 0 ]; then
     echo -e "\n Відновлення завершено успішно."
-    echo "Лог записано у файл: $TEMPLATE_LOG_FILE"
+    echo "Лог записано у файл: $MAKE_TEMPLATE_LOG_FILE"
 else
-    echo "\n Виводжу повний лог помилки ($TEMPLATE_LOG_FILE):"
+    echo "\n Виводжу повний лог помилки ($MAKE_TEMPLATE_LOG_FILE):"
     echo "========================================================"
     
     # cat виведе весь файл від початку до кінця
-    cat "$TEMPLATE_LOG_FILE"
+    cat "$MAKE_TEMPLATE_LOG_FILE"
     
     echo "========================================================"
     exit 1
@@ -40,6 +40,6 @@ qm set "$TEMPLATE_VM_ID" --name deploy-template
 # (Опційно) Видалити великий склеєний файл, щоб звільнити місце
 #rm -f "$UBUNTU_BACKUP_TEMPLATE_NAME"
 
-echo "Готово! Ваш шаблон (ID: $TEMPLATE_VM_ID) створено і готовий до клонування."
+echo "Готово! Ваш шаблон (ID: $MAKE_TEMPLATE_LOG_FILE) створено і готовий до клонування."
 
 
