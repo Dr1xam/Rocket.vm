@@ -20,6 +20,8 @@ while IFS= read -r line; do
     esac
 done
 
+qm set "$NEW_VM_ID" --name deploy-template
+
 # Перевірка результату
 if [ $? -eq 0 ]; then
     echo -e "\n Відновлення завершено успішно."
