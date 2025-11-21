@@ -23,8 +23,8 @@ done
 
 # Перевірка результату
 if [ $? -eq 0 ]; then
-    echo -e "\n Відновлення завершено успішно."
-    echo "Лог записано у файл: $MAKE_TEMPLATE_LOG_FILE"
+    echo -e "\nВідновлення завершено успішно."
+    echo "Лог відновлення записано у файл: $MAKE_TEMPLATE_LOG_FILE"
 else
     echo "\n Виводжу повний лог помилки ($MAKE_TEMPLATE_LOG_FILE):"
     echo "========================================================"
@@ -35,11 +35,10 @@ else
     echo "========================================================"
     exit 1
 fi
-qm set "$TEMPLATE_VM_ID" --name deploy-template
+qm set "$TEMPLATE_VM_ID" --name deploy-template &> /dev/null
 
 # (Опційно) Видалити великий склеєний файл, щоб звільнити місце
 #rm -f "$UBUNTU_BACKUP_TEMPLATE_NAME"
 
-echo "Готово! Ваш шаблон (ID: $MAKE_TEMPLATE_LOG_FILE) створено і готовий до клонування."
 
 
