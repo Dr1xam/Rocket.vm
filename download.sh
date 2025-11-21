@@ -57,17 +57,6 @@ fi
 #скрипт який все удалить + конфіг
 wget -q --show-progress "$URL_INSTALL_CONF"
 wget -q --show-progress "$URL_DELETE_SCRIPT"
-#Перевірка чи завантажено скріпт 
-if [ ! -f delete-script.sh ] || [ ! -f install.conf ]; then
-    echo "Помилка: Не всі файли завантажено."
-    rm -f ${FINAL_FILE_NAME}
-    rm -f install.conf
-    rm -f delete-script.sh
-    cd -f ${START_PATH}
-    rm -f download.sh
-    exit 1
-fi
-
 #інсталяція інших файлів
 wget -q --show-progress "$URL_MAKE_VM_SETTINGS"
 wget -q --show-progress "$URL_MAKE_TEMPLATE"
@@ -75,12 +64,12 @@ wget -q --show-progress "$URL_MAKE_TEMPLATE"
 wget -q --show-progress "$URL_INSTALL"
 
 #Перевірка чи завантажено скріпти
-if [ ! -f make-template.sh ] || [ ! -f install.sh ] || [ ! -f make-vm-settings.sh ]; then
+if [ ! -f delete-script.sh ] || [ ! -f install.conf ] || [ ! -f make-template.sh ] || [ ! -f install.sh ] || [ ! -f make-vm-settings.sh ]; then
     echo "Помилка: Не всі файли завантажено."
-    rm -f make-template.sh
-    rm -f install.sh
     rm -f ${FINAL_FILE_NAME}
     rm -f install.conf
+    rm -f make-template.sh
+    rm -f install.sh
     rm -f make-vm-settings.sh
     rm -f vm.conf
     rm -f make_template.log
