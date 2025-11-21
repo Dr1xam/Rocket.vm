@@ -1,85 +1,92 @@
 #!/bin/bash
-# Посилання на шматки
-URL_CONFIG="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/main/config"
 
-URL_INSTALL="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/main/install.sh"
-
-URL_MAKE_TEMPLATE="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/main/make_template.sh"
-
+# Посилання 
+URL_CONFIG="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/refactor-core/config"
+URL_INSTALL="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/refactor-core/install.sh"
+URL_MAKE_TEMPLATE="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/refactor-core/make-template.sh"
 URL_PARTS="https://github.com/Dr1xam/deployment-tool/releases/download/v1.0/"
+URL_DELETE_SCRIPT="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/refactor-core/delete-script.sh"
 
-echo "Завантаження конфігурацій..."
-wget -q --show-progress "$URL_CONFIG"
+# Шлях до фінального файлу бекапу
+FINAL_FILE_NAME="vzdump-qemu-101.vma.zst"
+FINAL_FILE_DIRECTORY="/var/lib/vz/dump"
+FINAL_FILE_PATH="${FINAL_FILE_DIRECTORY}/${FINAL_FILE_NAME}"
 
-source config
+# Приблизний розмір архіву для коректної смужки (21 файл по 100мб + 1 шматок ~23мб)
+# Це потрібно, щоб pv показував саме відсотки (%). Якщо розмір зміниться, смужка просто дійде до кінця раніше або пізніше.
+TOTAL_SIZE="2120m"
+
+# початкова директорія 
+START_PATH=$PWD
+
+# --- ПЕРЕВІРКА ТА ВСТАНОВЛЕННЯ PV ---
+if ! command -v pv &> /dev/null; then
+    echo "Встановлення pv для відображення єдиної смужки завантаження..."
+    apt-get update -qq && apt-get install -y pv
+fi
+
+#Назви частин архіву з бекапом убунту сервера
+PART_PREFIX="part_archive_"
+SUFFIXES=(
+  aa ab ac ad ae af ag ah ai aj ak al am an ao ap aq ar as at au av
+)
 
 cd ${FINAL_FILE_DIRECTORY}
 
+# Формуємо список усіх URL в один рядок
+URL_LIST=""
 for suffix in "${SUFFIXES[@]}"; do
-  # Формуємо повне ім'я файлу на сервері (наприклад, part_archive_aa)
-  PART_NAME="${PART_PREFIX}${suffix}"
-  
-  # Формуємо URL
-  URL="${URL_PARTS}${PART_NAME}"
-  
-  echo "Завантаження ${PART_NAME}..."
-
-  # Виконуємо завантаження
-  wget -q --show-progress -O "$PART_NAME" "$URL"
-  
-  # Перевірка, чи успішно скачався файл
-  if [ $? -ne 0 ]; then
-    echo "Помилка завантаження файлу ${LOCAL_NAME}. Перевірте інтернет або посилання."
-    rm ${PART_PREFIX}*
-    cd ${START_PATH}
-    rm config
-    exit 1
-  fi
+  URL_LIST="${URL_LIST} ${URL_PARTS}${PART_PREFIX}${suffix}"
 done
 
-echo "Усі частини завантажено успішно."
+echo "Початок завантаження шаблону для віртуальних машин "
 
-# --- СКЛЕЮВАННЯ ---
 
-echo "Склеювання частин у файл: ${FINAL_FILE_NAME}..."
+# Завантаження + Склеювання (однією смужкою)
+wget -q -O - $URL_LIST | pv -s $TOTAL_SIZE > "$FINAL_FILE_NAME"
 
-# cat part_archive_a* склеїть їх у правильному алфавітному порядку (aa, ab, ac, ...)
-cat $PART_PREFIX* > $FINAL_FILE_NAME
-
-if [ $? -eq 0 ]; then
-  echo "Склеювання завершено. Файл ${FINAL_FILE_NAME} готовий."
-else
-  echo "Помилка під час склеювання файлів."
-  rm ${PART_PREFIX}*
-  cd ${START_PATH}
-  rm config
-  exit 1
+# Перевірка статусу (pipefail гарантує помилку, якщо wget впаде)
+if [ ${PIPESTATUS[0]} -ne 0 ]; then
+    echo "Помилка завантаження!"
+    rm -f "$FINAL_FILE_NAME"
+    cd ${START_PATH}
+    exit 1
 fi
 
-rm ${PART_PREFIX}*
+#скрипт який все удалить + конфіг
+wget -q --show-progress "$URL_CONFIG"
+wget -q --show-progress "$URL_DELETE_SCRIPT"
+#Перевірка чи завантажено скріпт 
+if [ ! -f delete-script.sh ] || [ ! -f config ]; then
+    echo "Помилка: Не всі файли завантажено."
+    source config
+    rm -f ${FINAL_FILE_NAME}
+    rm -f config
+    rm -f delete-script.sh
+    cd -f ${START_PATH}
+    rm -f download.sh
+    exit 1
+fi
 
-cd ${START_PATH}
+#інсталяція інших файлів
 wget -q --show-progress "$URL_MAKE_TEMPLATE"
-
 #інсталтор в останю чергу
 wget -q --show-progress "$URL_INSTALL"
 
 #Перевірка чи завантажено скріпти
-if [ ! -f config ] || [ ! -f make_template.sh ] || [ ! -f install.sh ]; then
-    echo "Помилка: Частини програми не завантажені. Перевірте інтернет або посилання."
-    rm config
-    rm make_template.sh
-    rm install.sh
-    rm download.sh
-    rm /var/lib/vz/dump/template.vma.zst
+if [ ! -f make-template.sh ] || [ ! -f install.sh ]; then
+    echo "Помилка: Не всі файли завантажено."
+    ./delete-script.sh
+    cd ${START_PATH}
+    rm -f download.sh
     exit 1
 fi
 
 chmod +x install.sh
+chmod +x delete-script.sh
+chmod +x make-template.sh
 ./install.sh
 
-rm config
-rm make_template.sh
-rm install.sh
-rm download.sh
-rm /var/lib/vz/dump/template.vma.zst
+./delete-script.sh
+cd ${START_PATH}
+rm -f download.sh
