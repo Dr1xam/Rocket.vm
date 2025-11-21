@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Посилання 
-URL_CONFIG="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/refactor-core/config"
-URL_INSTALL="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/refactor-core/install.sh"
-URL_MAKE_TEMPLATE="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/refactor-core/make-template.sh"
+URL_CONFIG="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/main/config"
+URL_INSTALL="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/main/install.sh"
+URL_MAKE_TEMPLATE="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/main/make-template.sh"
 URL_PARTS="https://github.com/Dr1xam/deployment-tool/releases/download/v1.0/"
-URL_DELETE_SCRIPT="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/refactor-core/delete-script.sh"
+URL_DELETE_SCRIPT="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/main/delete-script.sh"
 
 # Шлях до фінального файлу бекапу
 FINAL_FILE_NAME="vzdump-qemu-101.vma.zst"
