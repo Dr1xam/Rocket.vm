@@ -1,12 +1,12 @@
 source install.conf
 
-echo "Відновлення VM $NEW_VM_ID... (деталі пишуться в $TEMPLATE_LOG_FILE)"
+echo "Відновлення VM $TEMPLATE_VM_ID... (деталі пишуться в $TEMPLATE_LOG_FILE)"
 
 set -o pipefail
 
 # qmrestore розпаковує архів у віртуальну машину
 # Запускаємо qmrestore
-qmrestore "$UBUNTU_BACKUP_TEMPLATE_NAME" "$NEW_VM_ID" --storage "$TARGET_STORAGE" --unique --force 2>&1 | \
+qmrestore "$UBUNTU_BACKUP_TEMPLATE_NAME" "$TEMPLATE_VM_ID" --storage "$TARGET_STORAGE" --unique --force 2>&1 | \
 while IFS= read -r line; do
     case "$line" in
         *progress*)
@@ -35,11 +35,11 @@ else
     echo "========================================================"
     exit 1
 fi
-qm set "$NEW_VM_ID" --name deploy-template
+qm set "$TEMPLATE_VM_ID" --name deploy-template
 
 # (Опційно) Видалити великий склеєний файл, щоб звільнити місце
 #rm -f "$UBUNTU_BACKUP_TEMPLATE_NAME"
 
-echo "Готово! Ваш шаблон (ID: $NEW_VM_ID) створено і готовий до клонування."
+echo "Готово! Ваш шаблон (ID: $TEMPLATE_VM_ID) створено і готовий до клонування."
 
 
