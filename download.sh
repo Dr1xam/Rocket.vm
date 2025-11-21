@@ -59,7 +59,6 @@ wget -q --show-progress "$URL_DELETE_SCRIPT"
 #Перевірка чи завантажено скріпт 
 if [ ! -f delete-script.sh ] || [ ! -f config ]; then
     echo "Помилка: Не всі файли завантажено."
-    source config
     rm -f ${FINAL_FILE_NAME}
     rm -f config
     rm -f delete-script.sh
