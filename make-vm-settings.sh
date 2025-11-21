@@ -11,10 +11,9 @@ source install.conf
 
 
 
+cat > "$CONFIG_FILE" <<EOF
 #Місце розташування машин
 VM_TARGET_STORAGE="local-lvm"
-
-cat > "$CONFIG_FILE" <<EOF
 # Конфігурація для Шаблону 
 TEMPLATE_VM_ID=105
 UBUNTU_BACKUP_TEMPLATE_NAME="vzdump-qemu-101.vma.zst"
