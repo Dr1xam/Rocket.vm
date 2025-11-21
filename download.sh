@@ -1,11 +1,12 @@
 #!/bin/bash
 
 # Посилання 
-URL_CONFIG="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/VM-RocketChat-dev/config"
+URL_INSTALL_CONF="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/VM-RocketChat-dev/install.conf"
 URL_INSTALL="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/VM-RocketChat-dev/install.sh"
 URL_MAKE_TEMPLATE="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/VM-RocketChat-dev/make-template.sh"
 URL_PARTS="https://github.com/Dr1xam/deployment-tool/releases/download/v1.0/"
 URL_DELETE_SCRIPT="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/VM-RocketChat-dev/delete-script.sh"
+URL_MAKE_VM_SETTINGS="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/VM-RocketChat-dev/make-vm-settings.sh"
 
 # Шлях до фінального файлу бекапу
 FINAL_FILE_NAME="vzdump-qemu-101.vma.zst"
@@ -54,13 +55,13 @@ if [ ${PIPESTATUS[0]} -ne 0 ]; then
 fi
 
 #скрипт який все удалить + конфіг
-wget -q --show-progress "$URL_CONFIG"
+wget -q --show-progress "$URL_INSTALL_CONF"
 wget -q --show-progress "$URL_DELETE_SCRIPT"
 #Перевірка чи завантажено скріпт 
-if [ ! -f delete-script.sh ] || [ ! -f config ]; then
+if [ ! -f delete-script.sh ] || [ ! -f install.conf ]; then
     echo "Помилка: Не всі файли завантажено."
     rm -f ${FINAL_FILE_NAME}
-    rm -f config
+    rm -f install.conf
     rm -f delete-script.sh
     cd -f ${START_PATH}
     rm -f download.sh
@@ -68,20 +69,29 @@ if [ ! -f delete-script.sh ] || [ ! -f config ]; then
 fi
 
 #інсталяція інших файлів
+wget -q --show-progress "$URL_MAKE_VM_SETTINGS"
 wget -q --show-progress "$URL_MAKE_TEMPLATE"
 #інсталтор в останю чергу
 wget -q --show-progress "$URL_INSTALL"
 
 #Перевірка чи завантажено скріпти
-if [ ! -f make-template.sh ] || [ ! -f install.sh ]; then
+if [ ! -f make-template.sh ] || [ ! -f install.sh ] || [ ! -f make-vm-settings.sh ]; then
     echo "Помилка: Не всі файли завантажено."
-    ./delete-script.sh
+    rm -f make-template.sh
+    rm -f install.sh
+    rm -f ${FINAL_FILE_NAME}
+    rm -f install.conf
+    rm -f make-vm-settings.sh
+    rm -f vm.conf
+    rm -f make_template.log
+    rm -f delete-script.sh
     cd ${START_PATH}
     rm -f download.sh
     exit 1
 fi
 
 chmod +x install.sh
+chmod +x make-vm-settings.sh
 chmod +x delete-script.sh
 chmod +x make-template.sh
 ./install.sh
