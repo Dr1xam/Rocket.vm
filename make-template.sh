@@ -1,4 +1,4 @@
-source config
+source install.conf
 
 echo "Відновлення VM $NEW_VM_ID... (деталі пишуться в $TEMPLATE_LOG_FILE)"
 
