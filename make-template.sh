@@ -20,14 +20,13 @@ while IFS= read -r line; do
     esac
 done
 
-qm set "$NEW_VM_ID" --name deploy-template
 
 # Перевірка результату
 if [ $? -eq 0 ]; then
     echo -e "\n Відновлення завершено успішно."
     echo "Лог записано у файл: $TEMPLATE_LOG_FILE"
 else
-    echo "Виводжу повний лог помилки ($TEMPLATE_LOG_FILE):"
+    echo "\n Виводжу повний лог помилки ($TEMPLATE_LOG_FILE):"
     echo "========================================================"
     
     # cat виведе весь файл від початку до кінця
@@ -36,6 +35,7 @@ else
     echo "========================================================"
     exit 1
 fi
+qm set "$NEW_VM_ID" --name deploy-template
 
 # (Опційно) Видалити великий склеєний файл, щоб звільнити місце
 #rm -f "$UBUNTU_BACKUP_TEMPLATE_NAME"
