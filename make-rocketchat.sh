@@ -1,9 +1,7 @@
 source vm.conf
 
-DEPLOY_LOG_FILE="deploy_rocketchat_vm.log"
-
 # Очищаємо старий лог (створюємо новий)
-echo "Клонування VM $ROCKETCHAT_VM_ID... (деталі пишуться в $DEPLOY_LOG_FILE)"
+echo "Клонування VM $ROCKETCHAT_VM_ID... (деталі пишуться в $DEPLOY_ROCKETCHAT_VM_LOG_FILE)"
 
 # Вмикаємо pipefail, щоб помилка qm clone передавалася через пайп
 set -o pipefail
@@ -22,7 +20,7 @@ while IFS= read -r line; do
             ;;
         *)
             # ВСЕ ІНШЕ: у лог
-            echo "$line" >> "$DEPLOY_LOG_FILE"
+            echo "$line" >> "$DEPLOY_ROCKETCHAT_VM_LOG_FILE"
             ;;
     esac
 done
@@ -31,9 +29,9 @@ done
 if [ $? -eq 0 ]; then
     echo -e "\n Клонування завершено успішно."
 else
-    echo -e "\n ПОМИЛКА КЛОНУВАННЯ ROKCKETCHAT! Дивіться лог ($DEPLOY_LOG_FILE):"
+    echo -e "\n ПОМИЛКА КЛОНУВАННЯ ROKCKETCHAT! Дивіться лог ($DEPLOY_ROCKETCHAT_VM_LOG_FILE):"
     echo "========================================================"
-    cat "$DEPLOY_LOG_FILE"
+    cat "$DEPLOY_ROCKETCHAT_VM_LOG_FILE"
     echo "========================================================"
     exit 1
 fi
@@ -48,26 +46,26 @@ qm set "$ROCKETCHAT_VM_ID" \
   --net0 virtio,bridge="$ROCKETCHAT_VM_BRIDGE" \
   --ipconfig0 ip="$ROCKETCHAT_VM_IP",gw="$GATEWAY" \
   --nameserver "$ROCKETCHAT_VM_DNS" \
-  --onboot 1 >> "$DEPLOY_LOG_FILE" 2>&1
+  --onboot 1 >> "$DEPLOY_ROCKETCHAT_VM_LOG_FILE" 2>&1
 
 if [ $? -eq 0 ]; then
 else
     echo "ПОМИЛКА"
-    echo "Деталі в лозі: $DEPLOY_LOG_FILE"
+    echo "Деталі в лозі: $DEPLOY_ROCKETCHAT_VM_LOG_FILE"
     exit 1
 fi
 
 # 3. РОЗШИРЕННЯ ДИСКА
 echo -n "Розширюю диск до $ROCKETCHAT_DISK... "
 
-qm resize "$ROCKETCHAT_VM_ID" scsi0 "$ROCKETCHAT_DISK" >> "$DEPLOY_LOG_FILE" 2>&1
+qm resize "$ROCKETCHAT_VM_ID" scsi0 "$ROCKETCHAT_DISK" >> "$DEPLOY_ROCKETCHAT_VM_LOG_FILE" 2>&1
 
 if [ $? -eq 0 ]; then
         echo -e "\nКлонування завершено успішно."
-    echo "Лог відновлення записано у файл: $DEPLOY_LOG_FILE"
+    echo "Лог відновлення записано у файл: $DEPLOY_ROCKETCHAT_VM_LOG_FILE"
 else
     echo "ПОМИЛКА"
-    cat "$DEPLOY_LOG_FILE"
+    cat "$DEPLOY_ROCKETCHAT_VM_LOG_FILE"
     exit 1
 fi
 
