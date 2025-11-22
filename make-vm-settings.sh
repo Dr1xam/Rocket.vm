@@ -61,7 +61,7 @@ UBUNTU_BACKUP_TEMPLATE_NAME="vzdump-qemu-101.vma.zst"
 MAKE_TEMPLATE_LOG_FILE="make_template.log"
 #Коніфгурація для Машини з рокетчатом
 ROCKETCHAT_VM_ID="${VM_IDS[1]}"
-ROCKETCHAT_VM_HOSTNAME="rocketchat-srv"
+ROCKETCHAT_VM_HOSTNAME="rocketchat"
 ROCKETCHAT_DISK="50G"
 ROCKETCHAT_VM_RAM="4096"
 ROCKETCHAT_VM_CORES="4"
