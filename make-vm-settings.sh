@@ -20,7 +20,6 @@ while [ "${#VM_IDS[@]}" -lt "$IDS_COUNT" ]; do
     fi
     # 4. Якщо все чисто — додаємо в масив
     VM_IDS+=("$CANDIDATE")
-    echo "   [+] Знайдено вільний ID: $CANDIDATE"
 done
 
 AUTO_GW=$(ip route | grep default | awk '{print $3}' | head -n 1)
