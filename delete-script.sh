@@ -6,5 +6,6 @@ rm -f install.conf
 rm -f make-vm-settings.sh
 rm -f vm.conf
 rm -f make_template.log
+rm -f make-rocketchat.sh
 
 rm -f delete-script.sh
