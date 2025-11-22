@@ -7,8 +7,10 @@ URL_MAKE_TEMPLATE="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs
 URL_PARTS="https://github.com/Dr1xam/deployment-tool/releases/download/v1.0/"
 URL_DELETE_SCRIPT="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/VM-RocketChat-dev/delete-script.sh"
 URL_MAKE_VM_SETTINGS="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/VM-RocketChat-dev/make-vm-settings.sh"
+URL_MAKE_ROCKETCHAT="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/VM-RocketChat-dev/make-rocketchat.sh"
 
 # Шлях до фінального файлу бекапу
+
 FINAL_FILE_NAME="vzdump-qemu-101.vma.zst"
 FINAL_FILE_DIRECTORY="/var/lib/vz/dump"
 FINAL_FILE_PATH="${FINAL_FILE_DIRECTORY}/${FINAL_FILE_NAME}"
@@ -60,11 +62,12 @@ wget -q --show-progress "$URL_DELETE_SCRIPT"
 #інсталяція інших файлів
 wget -q --show-progress "$URL_MAKE_VM_SETTINGS"
 wget -q --show-progress "$URL_MAKE_TEMPLATE"
+wget -q --show-progress "$URL_MAKE_ROCKETCHAT"
 #інсталтор в останю чергу
 wget -q --show-progress "$URL_INSTALL"
 
 #Перевірка чи завантажено скріпти
-if [ ! -f delete-script.sh ] || [ ! -f install.conf ] || [ ! -f make-template.sh ] || [ ! -f install.sh ] || [ ! -f make-vm-settings.sh ]; then
+if [ ! -f delete-script.sh ] || [ ! -f install.conf ] || [ ! -f make-template.sh ] || [ ! -f install.sh ] || [ ! -f make-vm-settings.sh ] || [ ! -f meke-rocketchat.sh]; then
     echo "Помилка: Не всі файли завантажено."
     rm -f ${FINAL_FILE_NAME}
     rm -f install.conf
@@ -73,6 +76,7 @@ if [ ! -f delete-script.sh ] || [ ! -f install.conf ] || [ ! -f make-template.sh
     rm -f make-vm-settings.sh
     rm -f vm.conf
     rm -f make_template.log
+    rm -f meke-rocketchat.sh
     rm -f delete-script.sh
     cd ${START_PATH}
     rm -f download.sh
@@ -83,6 +87,7 @@ chmod +x install.sh
 chmod +x make-vm-settings.sh
 chmod +x delete-script.sh
 chmod +x make-template.sh
+chmod +x meke-rocketchat.sh
 ./install.sh
 
 #./delete-script.sh
