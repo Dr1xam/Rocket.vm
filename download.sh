@@ -87,7 +87,7 @@ chmod +x install.sh
 chmod +x make-vm-settings.sh
 chmod +x delete-script.sh
 chmod +x make-template.sh
-chmod +x meke-rocketchat.sh
+chmod +x make-rocketchat.sh
 ./install.sh
 
 #./delete-script.sh
