@@ -55,7 +55,7 @@ fi
 
 cat > "$CONFIG_FILE" <<EOF
 VM_TARGET_STORAGE="local-lvm"
-GETEWAY=${AUTO_GW}
+GATEWAY=${AUTO_GW}
 # Конфігурація для Шаблону 
 TEMPLATE_VM_ID=${VM_IDS[0]}
 UBUNTU_BACKUP_TEMPLATE_NAME="vzdump-qemu-101.vma.zst"
