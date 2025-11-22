@@ -48,7 +48,7 @@ done
 
 # Перевірка
 if [[ "${#IPS[@]}" -lt "$WANTED_IPS_COUNT" ]]; then
-    echo "❌ Не вистачило вільних IP!"
+    echo "Не вистачило вільних IP!"
     exit 1
 fi
 
