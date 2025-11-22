@@ -48,8 +48,7 @@ qm set "$ROCKETCHAT_VM_ID" \
   --nameserver "$ROCKETCHAT_VM_DNS" \
   --onboot 1 >> "$DEPLOY_ROCKETCHAT_VM_LOG_FILE" 2>&1
 
-if [ $? -eq 0 ]; then
-else
+if [ $? -ne 0 ]; then
     echo "ПОМИЛКА"
     echo "Деталі в лозі: $DEPLOY_ROCKETCHAT_VM_LOG_FILE"
     exit 1
