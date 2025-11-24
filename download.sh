@@ -12,7 +12,7 @@ URL_ROCKETCHAT="https://github.com/Dr1xam/deployment-tool/releases/download/v1.0
 
 # Шлях до фінального файлу бекапу
 
-FINAL_FILE_NAME="vzdump-qemu-101.vma.zst"
+FINAL_FILE_NAME="vzdump-qemu-815898734-2025_11_24-17_42_12.vma.zst"
 FINAL_FILE_DIRECTORY="/var/lib/vz/dump"
 FINAL_FILE_PATH="${FINAL_FILE_DIRECTORY}/${FINAL_FILE_NAME}"
 
