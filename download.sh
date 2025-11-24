@@ -8,6 +8,7 @@ URL_PARTS="https://github.com/Dr1xam/deployment-tool/releases/download/v1.0/"
 URL_DELETE_SCRIPT="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/VM-RocketChat-dev/delete-script.sh"
 URL_MAKE_VM_SETTINGS="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/VM-RocketChat-dev/make-vm-settings.sh"
 URL_MAKE_ROCKETCHAT="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/VM-RocketChat-dev/make-rocketchat.sh"
+URL_ROCKETCHAT="https://github.com/Dr1xam/deployment-tool/releases/download/v1.0/Rocketchat.tar.gz"
 
 # Шлях до фінального файлу бекапу
 
@@ -63,6 +64,7 @@ wget -q --show-progress "$URL_DELETE_SCRIPT"
 wget -q --show-progress "$URL_MAKE_VM_SETTINGS"
 wget -q --show-progress "$URL_MAKE_TEMPLATE"
 wget -q --show-progress "$URL_MAKE_ROCKETCHAT"
+wget -qO - https://github.com/Dr1xam/deployment-tool/releases/download/v1.0/Rocketchat.tar.gz | tar -xz
 #інсталтор в останю чергу
 wget -q --show-progress "$URL_INSTALL"
 
