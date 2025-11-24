@@ -51,10 +51,12 @@ if [[ "${#IPS[@]}" -lt "$WANTED_IPS_COUNT" ]]; then
     exit 1
 fi
 
+PROXMOX_IP=$(ip -4 addr show vmbr0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
 
 cat > "$CONFIG_FILE" <<EOF
 VM_TARGET_STORAGE="local-lvm"
 GATEWAY=${AUTO_GW}
+PROXMOX_IP=${PROXMOX_IP}
 # Конфігурація для Шаблону 
 TEMPLATE_VM_ID=${VM_IDS[0]}
 UBUNTU_BACKUP_TEMPLATE_NAME="vzdump-qemu-101.vma.zst"
