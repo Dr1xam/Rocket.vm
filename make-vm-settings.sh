@@ -59,7 +59,7 @@ GATEWAY=${AUTO_GW}
 PROXMOX_IP=${PROXMOX_IP}
 # Конфігурація для Шаблону 
 TEMPLATE_VM_ID=${VM_IDS[0]}
-UBUNTU_BACKUP_TEMPLATE_NAME="vzdump-qemu-101.vma.zst"
+UBUNTU_BACKUP_TEMPLATE_NAME="vzdump-qemu-815898734-2025_11_24-17_42_12.vma.zst"
 MAKE_TEMPLATE_LOG_FILE="make_template.log"
 #Коніфгурація для машини з рокетчатом
 ROCKETCHAT_VM_ID="${VM_IDS[1]}"
