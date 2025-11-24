@@ -64,12 +64,12 @@ wget -q --show-progress "$URL_DELETE_SCRIPT"
 wget -q --show-progress "$URL_MAKE_VM_SETTINGS"
 wget -q --show-progress "$URL_MAKE_TEMPLATE"
 wget -q --show-progress "$URL_MAKE_ROCKETCHAT"
-wget -qO - https://github.com/Dr1xam/deployment-tool/releases/download/v1.0/Rocketchat.tar.gz | tar -xz
+wget -q --show-progress "$URL_ROCKETCHAT"
 #інсталтор в останю чергу
 wget -q --show-progress "$URL_INSTALL"
 
 #Перевірка чи завантажено скріпти
-if [ ! -f delete-script.sh ] || [ ! -f install.conf ] || [ ! -f make-template.sh ] || [ ! -f install.sh ] || [ ! -f make-vm-settings.sh ] || [ ! -f meke-rocketchat.sh ] || [ ! -f Rocketchat ]; then
+if [ ! -f delete-script.sh ] || [ ! -f install.conf ] || [ ! -f make-template.sh ] || [ ! -f install.sh ] || [ ! -f make-vm-settings.sh ] || [ ! -f meke-rocketchat.sh ] || [ ! -f Rocketchat.tar.gz ]; then
     echo "Помилка: Не всі файли завантажено."
     rm -f ${FINAL_FILE_NAME}
     rm -f install.conf
@@ -80,7 +80,7 @@ if [ ! -f delete-script.sh ] || [ ! -f install.conf ] || [ ! -f make-template.sh
     rm -f make_template.log
     rm -f meke-rocketchat.sh
     rm -f delete-script.sh
-    rm -f Rocketchat
+    rm -f Rocketchat.tar.gz
     cd ${START_PATH}
     rm -f download.sh
     exit 1
