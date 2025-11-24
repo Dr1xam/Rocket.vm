@@ -8,6 +8,6 @@ rm -f vm.conf
 rm -f make_template.log
 rm -f make-rocketchat.sh
 rm -f deploy_rocketchat_vm.log
-rm -f Rocketchat
+rm -f Rocketchat.tar.gz
 
 rm -f delete-script.sh
