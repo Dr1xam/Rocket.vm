@@ -68,6 +68,31 @@ else
     exit 1
 fi
 
+echo "Запускаю VM $ROCKETCHAT_VM_ID..."
+qm start "$ROCKETCHAT_VM_ID"
+
+echo -n "Очікую повної готовності системи..."
+
+# Налаштування тайм-ауту (щоб не чекати вічно, якщо машина зависла)
+MAX_WAIT_SECONDS=300
+TIMER=0
+
+# Цикл: поки команда qm agent ping повертає помилку — чекаємо
+while ! qm agent "$ROCKETCHAT_VM_ID" ping > /dev/null 2>&1; do
+    
+    # Перевірка на тайм-аут
+    if [ "$TIMER" -ge "$MAX_WAIT_SECONDS" ]; then
+        echo -e "\nТайм-аут! VM не запустила QEMU Agent за $MAX_WAIT_SECONDS секунд."
+        exit 1
+    fi
+
+    # Чекаємо 1 секунду
+    sleep 1
+    ((TIMER++))
+    echo -n "."
+done
+
+echo -e "\nСистема завантажена! (Час запуску: ${TIMER}с)"
 
 
 #Встановлення рокетчату
