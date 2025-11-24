@@ -59,7 +59,7 @@ GATEWAY=${AUTO_GW}
 TEMPLATE_VM_ID=${VM_IDS[0]}
 UBUNTU_BACKUP_TEMPLATE_NAME="vzdump-qemu-101.vma.zst"
 MAKE_TEMPLATE_LOG_FILE="make_template.log"
-#Коніфгурація для Машини з рокетчатом
+#Коніфгурація для машини з рокетчатом
 ROCKETCHAT_VM_ID="${VM_IDS[1]}"
 ROCKETCHAT_VM_HOSTNAME="rocketchat"
 ROCKETCHAT_DISK="50G"
@@ -69,4 +69,5 @@ ROCKETCHAT_VM_IP="${IPS[0]}"
 ROCKETCHAT_VM_BRIDGE="vmbr0"
 ROCKETCHAT_VM_DNS="8.8.8.8"
 DEPLOY_ROCKETCHAT_VM_LOG_FILE="deploy_rocketchat_vm.log"
+ROCKRTCHAT_ARCHIVE_NAME="Rocketchat.tar.gz"
 EOF
