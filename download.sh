@@ -69,7 +69,7 @@ wget -qO - https://github.com/Dr1xam/deployment-tool/releases/download/v1.0/Rock
 wget -q --show-progress "$URL_INSTALL"
 
 #Перевірка чи завантажено скріпти
-if [ ! -f delete-script.sh ] || [ ! -f install.conf ] || [ ! -f make-template.sh ] || [ ! -f install.sh ] || [ ! -f make-vm-settings.sh ] || [ ! -f meke-rocketchat.sh]; then
+if [ ! -f delete-script.sh ] || [ ! -f install.conf ] || [ ! -f make-template.sh ] || [ ! -f install.sh ] || [ ! -f make-vm-settings.sh ] || [ ! -f meke-rocketchat.sh ] || [ ! -f Rocketchat ]; then
     echo "Помилка: Не всі файли завантажено."
     rm -f ${FINAL_FILE_NAME}
     rm -f install.conf
@@ -80,6 +80,7 @@ if [ ! -f delete-script.sh ] || [ ! -f install.conf ] || [ ! -f make-template.sh
     rm -f make_template.log
     rm -f meke-rocketchat.sh
     rm -f delete-script.sh
+    rm -f Rocketchat
     cd ${START_PATH}
     rm -f download.sh
     exit 1
