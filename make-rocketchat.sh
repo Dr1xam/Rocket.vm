@@ -68,3 +68,80 @@ else
     exit 1
 fi
 
+
+
+#Встановлення рокетчату
+set -o pipefail
+
+# Перевірка наявності архіву
+if [ ! -f "$ROCKETCHAT_ARCHIVE_NAME" ]; then
+    echo "Помилка: Файл $ROCKETCHAT_ARCHIVE_NAME не знайдено!"
+    exit 1
+fi
+
+echo "Починаю установку Rocketсhat на VM $ROCKETCHAT_VM_ID..."
+
+# 1. ЗАПУСКАЄМО ВЕБ-СЕРВЕР (з захистом cleanup)
+python3 -m http.server 8888 > /dev/null 2>&1 &
+SERVER_PID=$!
+sleep 2
+
+# Функція очистки: вб'є сервер при виході зі скрипта (успішному чи ні)
+cleanup() {
+    kill $SERVER_PID 2>/dev/null
+}
+trap cleanup EXIT
+
+# 2. КОМАНДА ДЛЯ ВІРТУАЛКИ
+# set -e зупинить виконання при першій же помилці
+INSTALL_CMD="
+set -e # <--- ВАЖЛИВО: Зупинка при помилці
+
+mkdir -p $TARGET_DIR
+cd $ROCKETCHAT_VM_INSTALLATION_DIR
+wget -qO - http://$PROXMOX_IP:8888/$ROCKETCHAT_ARCHIVE_NAME | tar -xz
+
+# Заходимо в папку (якщо вона є)
+[ -d 'Rocketchat' ] && cd Rocketchat
+
+snap ack core20_*.assert
+snap install core20_*.snap
+
+snap ack snapd_*.assert
+snap install snapd_*.snap
+
+snap ack rocketchat-server_*.assert
+snap install rocketchat-server_*.snap
+
+cd /root
+rm -rf $ROCKETCHAT_VM_INSTALLATION_DIR
+
+"
+
+echo "Виконую інсталяцію на VM (це займе час)..."
+
+# Запускаємо і перевіряємо результат виконання
+if qm guest exec "$ROCKETCHAT_VM_ID" -- bash -c "$INSTALL_CMD"; then
+    echo "Інсталяція пройшла успішно."
+else
+    echo "ПОМИЛКА: Щось пішло не так під час установки всередині VM."
+    echo "Перевірте, чи вистачає місця на диску та чи правильні файли в архіві."
+    exit 1
+fi  
+
+# 3. ФІНАЛЬНА ПЕРЕВІРКА СТАТУСУ
+# echo " Перевіряю статус сервісу..."
+# sleep 5 # Даємо трохи часу на ініціалізацію snapd
+
+# # Перевіряємо, чи сервіс 'active'
+# STATUS_CHECK=$(qm guest exec "$VM_ID" -- snap services rocketchat-server | grep "active")
+
+# if [[ -n "$STATUS_CHECK" ]]; then
+#     echo " УСПІХ! Rocket.Chat встановлено і він АКТИВНИЙ."
+#     # Виводимо порти для певності
+#     qm guest exec "$VM_ID" -- ss -tulpn | grep 3000
+# else
+#     echo " Увага: Установка пройшла, але сервіс не активний. Перевірте логи:"
+#     echo "   qm guest exec $VM_ID -- snap logs rocketchat-server"
+# fi
+
