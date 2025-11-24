@@ -78,7 +78,7 @@ if [ ! -f delete-script.sh ] || [ ! -f install.conf ] || [ ! -f make-template.sh
     rm -f make-vm-settings.sh
     rm -f vm.conf
     rm -f make_template.log
-    rm -f meke-rocketchat.sh
+    rm -f make-rocketchat.sh
     rm -f delete-script.sh
     rm -f Rocketchat.tar.gz
     cd ${START_PATH}
