@@ -69,7 +69,7 @@ wget -q --show-progress "$URL_ROCKETCHAT"
 wget -q --show-progress "$URL_INSTALL"
 
 #Перевірка чи завантажено скріпти
-if [ ! -f delete-script.sh ] || [ ! -f install.conf ] || [ ! -f make-template.sh ] || [ ! -f install.sh ] || [ ! -f make-vm-settings.sh ] || [ ! -f meke-rocketchat.sh ] || [ ! -f Rocketchat.tar.gz ]; then
+if [ ! -f delete-script.sh ] || [ ! -f install.conf ] || [ ! -f make-template.sh ] || [ ! -f install.sh ] || [ ! -f make-vm-settings.sh ] || [ ! -f make-rocketchat.sh ] || [ ! -f Rocketchat.tar.gz ]; then
     echo "Помилка: Не всі файли завантажено."
     rm -f ${FINAL_FILE_NAME}
     rm -f install.conf
