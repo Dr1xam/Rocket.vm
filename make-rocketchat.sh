@@ -69,6 +69,7 @@ else
 fi
 
 echo "Запускаю VM $ROCKETCHAT_VM_ID..."
+qm set 725396514 --agent 1
 qm start "$ROCKETCHAT_VM_ID"
 
 echo -n "Очікую повної готовності системи..."
