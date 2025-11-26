@@ -73,4 +73,5 @@ ROCKETCHAT_VM_DNS="8.8.8.8"
 DEPLOY_ROCKETCHAT_VM_LOG_FILE="deploy_rocketchat_vm.log"
 ROCKETCHAT_ARCHIVE_NAME="Rocketchat.tar.gz"
 ROCKETCHAT_VM_INSTALLATION_DIR="/root/offline_install"
+DEPLOY_ROCKETCHAT_LOG_FILE="deploy_rocketchat.log"
 EOF
