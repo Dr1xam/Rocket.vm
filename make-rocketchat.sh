@@ -126,7 +126,7 @@ exec > /tmp/vm_debug.log 2>&1
 set -x
 set -e
 
-mkdir -p $TARGET_DIR
+mkdir -p $ROCKETCHAT_VM_INSTALLATION_DIR
 cd $ROCKETCHAT_VM_INSTALLATION_DIR
 wget -qO - http://$PROXMOX_IP:8888/$ROCKETCHAT_ARCHIVE_NAME | tar -xz
 
