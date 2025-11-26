@@ -156,47 +156,7 @@ echo "Done!"
 EOF
 
 CMD="wget -qO /root/install.sh http://$PROXMOX_IP:8888/install_rocketchat_in_vm.sh && chmod +x /root/install.sh && /root/install.sh > /dev/null 2>&1"
-EXEC_OUTPUT=$(qm guest exec "$ROCKETCHAT_VM_ID" --timeout 1 -- bash -c "$CMD")
-
-
-# -----------------
-# 2. Витягуємо PID процесу (тихо)
-PID=$(echo "$EXEC_OUTPUT" | grep -oP '"pid":\s*\K\d+')
-echo "DEBUG: Proxmox відповів: $PID"
-
-# # Перевірка, чи взагалі запустилося
-# if [ -z "$PID" ]; then
-#     echo "Критична помилка: Агент не відповів."
-#     exit 1
-# fi
-
-# 3. Тихо чекаємо завершення
-while true; do
-    # Запитуємо статус
-    STATUS=$(qm guest exec-status "$ROCKETCHAT_VM_ID" "$PID")
-    
-    # Перевіряємо, чи процес завершився ("exited":1)
-    if echo "$STATUS" | grep -q '"exited":1'; then
-        # Перевіряємо код виходу ("exitcode":0 - це успіх)
-        if echo "$STATUS" | grep -q '"exitcode":0'; then
-            qm guest exec "$ROCKETCHAT_VM_ID" -- bash -c "cat /tmp/vm_debug.log && rm /tmp/vm_debug.log" > "$DEPLOY_ROCKETCHAT_LOG_FILE"
-            echo "Інсталяція завершена успішно!"
-            break
-        else
-            # ПОМИЛКА (Тільки зараз щось виводимо)
-            qm guest exec "$ROCKETCHAT_VM_ID" -- bash -c "cat /tmp/vm_debug.log && rm /tmp/vm_debug.log" > "$DEPLOY_ROCKETCHAT_LOG_FILE"
-            echo -e "\n ПОМИЛКА: Інсталяція впала! Дивіться лог ($DEPLOY_ROCKETCHAT_LOG_FILE):"
-            echo "========================================================"
-            cat "$DEPLOY_ROCKETCHAT_LOG_FILE"
-            echo "========================================================"
-            rm -f install_rocketchat_in_vm.sh
-            exit 1
-        fi
-    fi
-    # Пауза перед наступною перевіркою
-    sleep 2
-done
-
+qm guest exec "$ROCKETCHAT_VM_ID" -- bash -c "$CMD"
 rm -f install_rocketchat_in_vm.sh
 
 
