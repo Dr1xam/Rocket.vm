@@ -158,10 +158,11 @@ EOF
 CMD="wget -qO /root/install.sh http://$PROXMOX_IP:8888/install_rocketchat_in_vm.sh && chmod +x /root/install.sh && /root/install.sh > /dev/null 2>&1"
 EXEC_OUTPUT=$(qm guest exec "$ROCKETCHAT_VM_ID" --timeout 1 -- bash -c "$CMD")
 
-echo "DEBUG: Proxmox відповів: $EXEC_OUTPUT"
+
 # -----------------
 # 2. Витягуємо PID процесу (тихо)
 PID=$(echo "$EXEC_OUTPUT" | grep -oP '"pid":\s*\K\d+')
+echo "DEBUG: Proxmox відповів: $PID"
 
 # # Перевірка, чи взагалі запустилося
 # if [ -z "$PID" ]; then
