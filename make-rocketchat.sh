@@ -156,7 +156,51 @@ echo "Done!"
 EOF
 
 CMD="wget -qO /root/install.sh http://$PROXMOX_IP:8888/install_rocketchat_in_vm.sh && chmod +x /root/install.sh && /root/install.sh > /dev/null 2>&1"
-qm guest exec "$ROCKETCHAT_VM_ID" -- bash -c "$CMD"
+EXEC_RESPONSE=$(qm guest exec "$ROCKETCHAT_VM_ID" -- bash -c "$CMD")
+
+# 2. Витягуємо PID (ігноруємо пробіли)
+PID=$(echo "$EXEC_RESPONSE" | grep -oP '"pid":\s*\K\d+')
+
+# Перевірка, чи вдалося запустити
+if [ -z "$PID" ]; then
+    echo "Помилка запуску! Агент не повернув PID."
+    echo "Відповідь була: $EXEC_RESPONSE"
+    exit 1
+fi
+
+echo "Процес пішов (PID: $PID). Чекаю завершення..."
+
+# 3. Цикл очікування (Поки процес працює)
+while true; do
+    # Запитуємо статус процесу
+    STATUS_JSON=$(qm guest exec-status "$ROCKETCHAT_VM_ID" "$PID")
+    
+    # Перевіряємо, чи процес завершився ("exited": 1)
+    if echo "$STATUS_JSON" | grep -q '"exited":1'; then
+        
+        # 4. МОМЕНТ ІСТИНИ: Перевіряємо код успіху
+        # "exitcode":0 — це перемога. Будь-яке інше число — помилка.
+        EXIT_CODE=$(echo "$STATUS_JSON" | grep -oP '"exitcode":\s*\K\d+')
+        
+        if [ "$EXIT_CODE" == "0" ]; then
+            echo "УСПІХ! Команда виконана без помилок."
+        else
+            echo "ПОМИЛКА! Команда повернула код: $EXIT_CODE"
+            # Тут можна додати вивід логу, якщо треба
+            exit 1
+        fi
+        
+        break # Виходимо з циклу
+    fi
+    
+    # Якщо процес ще йде — чекаємо 2 секунди і питаємо знову
+    sleep 2
+    echo -n "."
+done
+
+echo "" # Просто відступ
+
+
 rm -f install_rocketchat_in_vm.sh
 
 
