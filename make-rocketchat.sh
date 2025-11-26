@@ -146,7 +146,6 @@ cd /root
 rm -rf $ROCKETCHAT_VM_INSTALLATION_DIR
 "
 
-echo "Виконую інсталяцію на VM..."
 echo "Виконую інсталяцію rocketchat на VM...(деталі пишуться в $DEPLOY_ROCKETCHAT_LOG_FILE)"
 
 # Запускаємо
