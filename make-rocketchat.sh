@@ -171,53 +171,44 @@ echo "Процес пішов (PID: $PID). Чекаю завершення..."
 
 # 4. ЦИКЛ ОЧІКУВАННЯ
 while true; do
-    # Запитуємо статус
+    # 1. Отримуємо статус (і stdout, і stderr)
     STATUS_JSON=$(qm guest exec-status "$ROCKETCHAT_VM_ID" "$PID" 2>&1)
-    
-    # --- ПЕРЕВІРКА 1: Процес завершився штатно ---
-    if echo "$STATUS_JSON" | grep -q '"exited":1'; then
-        # Якщо Proxmox зберіг статус, беремо його
-        EXIT_CODE=$(echo "$STATUS_JSON" | grep -oP '"exitcode":\s*\K\d+')
-        break
+
+    # --- УМОВА 1: Це взагалі JSON? (Перевірка на помилку/текст) ---
+    # Якщо у відповіді НЕМАЄ слова "exited", значить це якась текстова помилка
+    if ! echo "$STATUS_JSON" | grep -q "exited"; then
+        echo -e "\n КРИТИЧНА ПОМИЛКА СТАТУСУ!"
+        echo "   Proxmox повернув не JSON, а текст:"
+        echo "   >> $STATUS_JSON"
+        exit 1
     fi
 
-    # --- ПЕРЕВІРКА 2: Процес зник (Ваша помилка "PID does not exist") ---
-    # Це означає, що процес закінчився, і агент вже забув про нього.
-    # Тоді ми читаємо результат з файлу /tmp/install_result
-    if echo "$STATUS_JSON" | grep -q "does not exist"; then
-        echo "Процес зник зі списку завдань агента. Перевіряю файл-результат..."
-        
-        # Читаємо файл, який створила наша команда
-        FILE_CHECK=$(qm guest exec "$ROCKETCHAT_VM_ID" -- cat /tmp/install_result)
-        
-        # Витягуємо цифру з відповіді
-        EXIT_CODE=$(echo "$FILE_CHECK" | grep -oP '"out-data":"\s*\K\d+')
-        
-        # Якщо файл ще не створено (дуже рідкісний випадок глюка), ставимо код помилки
-        if [ -z "$EXIT_CODE" ]; then EXIT_CODE=1; fi
-        
-        break
+    # --- УМОВА 2: Процес ще працює? ("exited": 0) ---
+    if echo "$STATUS_JSON" | grep -qP '"exited"\s*:\s*0'; then
+        echo -n "."
+        sleep 2
+        continue  # Йдемо на наступне коло циклу
     fi
-    
-    # Якщо процес ще йде — чекаємо
-    sleep 2
-    echo -n "."
+
+    # --- УМОВА 3: Процес завершився ("exited": 1) ---
+    if echo "$STATUS_JSON" | grep -qP '"exited"\s*:\s*1'; then
+        
+        # Витягуємо код виходу
+        EXIT_CODE=$(echo "$STATUS_JSON" | grep -oP '"exitcode"\s*:\s*\K\d+')
+
+        if [ "$EXIT_CODE" == "0" ]; then
+            echo -e "\n УСПІХ! Інсталяція завершена без помилок."
+            break # Виходимо з циклу, все добре
+        else
+            echo -e "\n ПОМИЛКА ІНСТАЛЯЦІЇ! Код виходу: $EXIT_CODE"
+            # (Опціонально) Спробувати вивести текст помилки з JSON, якщо він там є
+            # echo "$STATUS_JSON"
+            exit 1
+        fi
+    fi
 done
 
 echo "" # Новий рядок
-
-# 5. ФІНАЛЬНИЙ ВЕРДИКТ
-if [ "$EXIT_CODE" == "0" ]; then
-    echo "УСПІХ! Команда виконана без помилок."
-    # Прибираємо файл
-    qm guest exec "$ROCKETCHAT_VM_ID" -- rm /tmp/install_result >/dev/null
-else
-    echo "ПОМИЛКА! Команда повернула код: $EXIT_CODE"
-    # Тут можна додати читання логу помилки, якщо треба
-    exit 1
-fi
-
-
 rm -f install_rocketchat_in_vm.sh
 
 
