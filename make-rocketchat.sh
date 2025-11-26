@@ -120,19 +120,27 @@ trap cleanup EXIT
 
 # 2. КОМАНДА ДЛЯ ВІРТУАЛКИ
 # set -e зупинить виконання при першій же помилці
-INSTALL_CMD="
-# Пишемо все у тимчасовий файл ВСЕРЕДИНІ віртуалки
+echo "Виконую інсталяцію rocketchat на VM...(деталі пишуться в $DEPLOY_ROCKETCHAT_LOG_FILE)"
+cat > install_rocketchat_in_vm.sh <<EOF
+#!/bin/bash
+# Пишемо логи у файл всередині VM
 exec > /tmp/vm_debug.log 2>&1
 set -x
 set -e
 
+# Створюємо папку
 mkdir -p $ROCKETCHAT_VM_INSTALLATION_DIR
 cd $ROCKETCHAT_VM_INSTALLATION_DIR
+
+# Скачуємо
+echo "Downloading..."
 wget -qO - http://$PROXMOX_IP:8888/$ROCKETCHAT_ARCHIVE_NAME | tar -xz
 
 # Заходимо в папку (якщо вона є)
 [ -d 'Rocketchat' ] && cd Rocketchat
 
+# Встановлюємо Snap
+echo "Installing..."
 snap ack core20_*.assert
 snap install core20_*.snap
 
@@ -142,47 +150,54 @@ snap install snapd_*.snap
 snap ack rocketchat-server_*.assert
 snap install rocketchat-server_*.snap
 
+# Прибираємо за собою
 cd /root
 rm -rf $ROCKETCHAT_VM_INSTALLATION_DIR
-"
+echo "Done!"
+EOF
+CMD="wget -qO /root/install.sh http://$PROXMOX_IP:8888/install_rocketchat_in_vm.sh && chmod +x /root/install.sh && /root/install.sh > /dev/null 2>&1"
+EXEC_OUTPUT=$(qm guest exec "$ROCKETCHAT_VM_ID" --timeout 600 -- bash -c "$CMD")
 
-echo "Виконую інсталяцію rocketchat на VM...(деталі пишуться в $DEPLOY_ROCKETCHAT_LOG_FILE)"
-
-# Запускаємо
-EXEC_OUTPUT=$(qm guest exec "$ROCKETCHAT_VM_ID" -- bash -c "$INSTALL_CMD")
+# 2. Витягуємо PID процесу (тихо)
 PID=$(echo "$EXEC_OUTPUT" | grep -oP '(?<="pid":)\d+')
 
+# Перевірка, чи взагалі запустилося
 if [ -z "$PID" ]; then
-    echo "Помилка: Не вдалося запустити команду на VM (Агент не відповідає)."
+    echo "Критична помилка: Агент не відповів."
     exit 1
 fi
-# Ми перевіряємо статус кожні 5 секунд
+
+# 3. Тихо чекаємо завершення
 while true; do
-    # Запитуємо статус процесу
-    STATUS_OUTPUT=$(qm guest exec-status "$ROCKETCHAT_VM_ID" "$PID")
+    # Запитуємо статус
+    STATUS=$(qm guest exec-status "$ROCKETCHAT_VM_ID" "$PID")
     
-    # Перевіряємо, чи є маркер "exited":1 (значить процес завершився)
-    if echo "$STATUS_OUTPUT" | grep -q '"exited":1'; then
-        qm guest exec "$ROCKETCHAT_VM_ID" -- bash -c "cat /tmp/vm_debug.log && rm /tmp/vm_debug.log" > "$DEPLOY_ROCKETCHAT_LOG_FILE"
-        # Перевіряємо код виходу ("exitcode":0 означає успіх)
-        if echo "$STATUS_OUTPUT" | grep -q '"exitcode":0'; then
+    # Перевіряємо, чи процес завершився ("exited":1)
+    if echo "$STATUS" | grep -q '"exited":1'; then
+        # Перевіряємо код виходу ("exitcode":0 - це успіх)
+        if echo "$STATUS" | grep -q '"exitcode":0'; then
+            qm guest exec "$ROCKETCHAT_VM_ID" -- bash -c "cat /tmp/vm_debug.log && rm /tmp/vm_debug.log" > "$DEPLOY_ROCKETCHAT_LOG_FILE"
             echo "Інсталяція завершена успішно!"
+            break
         else
+            # ПОМИЛКА (Тільки зараз щось виводимо)
+            qm guest exec "$ROCKETCHAT_VM_ID" -- bash -c "cat /tmp/vm_debug.log && rm /tmp/vm_debug.log" > "$DEPLOY_ROCKETCHAT_LOG_FILE"
             echo -e "\n ПОМИЛКА: Інсталяція впала! Дивіться лог ($DEPLOY_ROCKETCHAT_LOG_FILE):"
             echo "========================================================"
             cat "$DEPLOY_ROCKETCHAT_LOG_FILE"
             echo "========================================================"
-    exit 1
+            rm -f install_rocketchat_in_vm.sh
+            exit 1
         fi
-        break
     fi
-    
-    # Якщо ще працює — чекаємо і крутимо індикатор
-    echo -n "."
-    sleep 5
+    # Пауза перед наступною перевіркою
+    sleep 2
 done
-echo "" # Новий рядок після крапок
 
+rm -f install_rocketchat_in_vm.sh
+
+
+#________________________________________________________________________
 # 3. ФІНАЛЬНА ПЕРЕВІРКА СТАТУСУ
 # echo " Перевіряю статус сервісу..."
 # sleep 5 # Даємо трохи часу на ініціалізацію snapd
