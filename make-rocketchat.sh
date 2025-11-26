@@ -122,8 +122,6 @@ trap cleanup EXIT
 # set -e зупинить виконання при першій же помилці
 cat > install_rocketchat_in_vm.sh <<EOF
 #!/bin/bash
-# Пишемо логи у файл всередині VM
-exec > /tmp/vm_debug.log 2>&1
 set -x
 set -e
 
@@ -152,7 +150,6 @@ snap install rocketchat-server_*.snap
 # Прибираємо за собою
 cd /root
 rm -rf $ROCKETCHAT_VM_INSTALLATION_DIR
-echo "Done!"
 EOF
 
 CMD="wget -qO /root/install.sh http://$PROXMOX_IP:8888/install_rocketchat_in_vm.sh && chmod +x /root/install.sh && /root/install.sh > /dev/null 2>&1"
