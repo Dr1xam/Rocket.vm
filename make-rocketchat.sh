@@ -155,6 +155,51 @@ else
     exit 1
 fi  
 
+#______________________________________
+INSTALL_CMD="
+# Пишемо все у тимчасовий файл ВСЕРЕДИНІ віртуалки
+exec > /tmp/vm_debug.log 2>&1
+set -x
+set -e
+
+mkdir -p $TARGET_DIR
+cd $ROCKETCHAT_VM_INSTALLATION_DIR
+wget -qO - http://$PROXMOX_IP:8888/$ROCKETCHAT_ARCHIVE_NAME | tar -xz
+
+# Заходимо в папку (якщо вона є)
+[ -d 'Rocketchat' ] && cd Rocketchat
+
+snap ack core20_*.assert
+snap install core20_*.snap
+
+snap ack snapd_*.assert
+snap install snapd_*.snap
+
+snap ack rocketchat-server_*.assert
+snap install rocketchat-server_*.snap
+
+cd /root
+rm -rf $ROCKETCHAT_VM_INSTALLATION_DIR
+"
+
+echo "Виконую інсталяцію на VM..."
+echo "Виконую інсталяцію rocketchat на VM...(деталі пишуться в $DEPLOY_ROCKETCHAT_LOG_FILE)"
+
+# Запускаємо
+qm guest exec "$ROCKETCHAT_VM_ID" -- bash -c "$INSTALL_CMD"
+qm guest exec "$ROCKETCHAT_VM_ID" -- bash -c "cat /tmp/vm_debug.log && rm /tmp/vm_debug.log" > "$DEPLOY_ROCKETCHAT_LOG_FILE"
+# Перевіряємо результат ($? зберігає код виходу останньої команди)
+if [ $? -eq 0 ]; then
+    echo "Інсталяція пройшла успішно."
+else
+    echo -e "\n ПОМИЛКА: Інсталяція впала! Дивіться лог ($DEPLOY_ROCKETCHAT_LOG_FILE):"
+    echo "========================================================"
+    cat "$DEPLOY_ROCKETCHAT_LOG_FILE"
+    echo "========================================================"
+    exit 1
+fi
+#______________________________________
+
 # 3. ФІНАЛЬНА ПЕРЕВІРКА СТАТУСУ
 # echo " Перевіряю статус сервісу..."
 # sleep 5 # Даємо трохи часу на ініціалізацію snapd
