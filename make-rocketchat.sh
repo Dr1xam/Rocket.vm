@@ -121,42 +121,6 @@ trap cleanup EXIT
 # 2. КОМАНДА ДЛЯ ВІРТУАЛКИ
 # set -e зупинить виконання при першій же помилці
 INSTALL_CMD="
-set -e # <--- ВАЖЛИВО: Зупинка при помилці
-
-mkdir -p $TARGET_DIR
-cd $ROCKETCHAT_VM_INSTALLATION_DIR
-wget -qO - http://$PROXMOX_IP:8888/$ROCKETCHAT_ARCHIVE_NAME | tar -xz
-
-# Заходимо в папку (якщо вона є)
-[ -d 'Rocketchat' ] && cd Rocketchat
-
-snap ack core20_*.assert
-snap install core20_*.snap
-
-snap ack snapd_*.assert
-snap install snapd_*.snap
-
-snap ack rocketchat-server_*.assert
-snap install rocketchat-server_*.snap
-
-cd /root
-rm -rf $ROCKETCHAT_VM_INSTALLATION_DIR
-
-"
-
-echo "Виконую інсталяцію на VM (це займе час)..."
-
-# Запускаємо і перевіряємо результат виконання
-if qm guest exec "$ROCKETCHAT_VM_ID" -- bash -c "$INSTALL_CMD"; then
-    echo "Інсталяція пройшла успішно."
-else
-    echo "ПОМИЛКА: Щось пішло не так під час установки всередині VM."
-    echo "Перевірте, чи вистачає місця на диску та чи правильні файли в архіві."
-    exit 1
-fi  
-
-#______________________________________
-INSTALL_CMD="
 # Пишемо все у тимчасовий файл ВСЕРЕДИНІ віртуалки
 exec > /tmp/vm_debug.log 2>&1
 set -x
@@ -198,7 +162,6 @@ else
     echo "========================================================"
     exit 1
 fi
-#______________________________________
 
 # 3. ФІНАЛЬНА ПЕРЕВІРКА СТАТУСУ
 # echo " Перевіряю статус сервісу..."
