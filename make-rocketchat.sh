@@ -149,18 +149,39 @@ rm -rf $ROCKETCHAT_VM_INSTALLATION_DIR
 echo "Виконую інсталяцію rocketchat на VM...(деталі пишуться в $DEPLOY_ROCKETCHAT_LOG_FILE)"
 
 # Запускаємо
-qm guest exec "$ROCKETCHAT_VM_ID" -- bash -c "$INSTALL_CMD"
-qm guest exec "$ROCKETCHAT_VM_ID" -- bash -c "cat /tmp/vm_debug.log && rm /tmp/vm_debug.log" > "$DEPLOY_ROCKETCHAT_LOG_FILE"
-# Перевіряємо результат ($? зберігає код виходу останньої команди)
-if [ $? -eq 0 ]; then
-    echo "Інсталяція пройшла успішно."
-else
-    echo -e "\n ПОМИЛКА: Інсталяція впала! Дивіться лог ($DEPLOY_ROCKETCHAT_LOG_FILE):"
-    echo "========================================================"
-    cat "$DEPLOY_ROCKETCHAT_LOG_FILE"
-    echo "========================================================"
+EXEC_OUTPUT=$(qm guest exec "$ROCKETCHAT_VM_ID" -- bash -c "$INSTALL_CMD")
+PID=$(echo "$EXEC_OUTPUT" | grep -oP '(?<="pid":)\d+')
+
+if [ -z "$PID" ]; then
+    echo "Помилка: Не вдалося запустити команду на VM (Агент не відповідає)."
     exit 1
 fi
+# Ми перевіряємо статус кожні 5 секунд
+while true; do
+    # Запитуємо статус процесу
+    STATUS_OUTPUT=$(qm guest exec-status "$ROCKETCHAT_VM_ID" "$PID")
+    
+    # Перевіряємо, чи є маркер "exited":1 (значить процес завершився)
+    if echo "$STATUS_OUTPUT" | grep -q '"exited":1'; then
+        qm guest exec "$ROCKETCHAT_VM_ID" -- bash -c "cat /tmp/vm_debug.log && rm /tmp/vm_debug.log" > "$DEPLOY_ROCKETCHAT_LOG_FILE"
+        # Перевіряємо код виходу ("exitcode":0 означає успіх)
+        if echo "$STATUS_OUTPUT" | grep -q '"exitcode":0'; then
+            echo "Інсталяція завершена успішно!"
+        else
+            echo -e "\n ПОМИЛКА: Інсталяція впала! Дивіться лог ($DEPLOY_ROCKETCHAT_LOG_FILE):"
+            echo "========================================================"
+            cat "$DEPLOY_ROCKETCHAT_LOG_FILE"
+            echo "========================================================"
+    exit 1
+        fi
+        break
+    fi
+    
+    # Якщо ще працює — чекаємо і крутимо індикатор
+    echo -n "."
+    sleep 5
+done
+echo "" # Новий рядок після крапок
 
 # 3. ФІНАЛЬНА ПЕРЕВІРКА СТАТУСУ
 # echo " Перевіряю статус сервісу..."
