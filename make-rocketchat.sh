@@ -155,22 +155,17 @@ rm -rf $ROCKETCHAT_VM_INSTALLATION_DIR
 echo "Done!"
 EOF
 
-while ! qm agent "$ROCKETCHAT_VM_ID" ping > /dev/null 2>&1; do
-    sleep 1
-    echo -n "."
-done
-
 CMD="wget -qO /root/install.sh http://$PROXMOX_IP:8888/install_rocketchat_in_vm.sh && chmod +x /root/install.sh && /root/install.sh > /dev/null 2>&1"
 EXEC_OUTPUT=$(qm guest exec "$ROCKETCHAT_VM_ID" -- bash -c "$CMD")
 
 # 2. Витягуємо PID процесу (тихо)
 PID=$(echo "$EXEC_OUTPUT" | grep -oP '"pid":\s*\K\d+')
 
-# Перевірка, чи взагалі запустилося
-if [ -z "$PID" ]; then
-    echo "Критична помилка: Агент не відповів."
-    exit 1
-fi
+# # Перевірка, чи взагалі запустилося
+# if [ -z "$PID" ]; then
+#     echo "Критична помилка: Агент не відповів."
+#     exit 1
+# fi
 
 # 3. Тихо чекаємо завершення
 while true; do
