@@ -159,7 +159,7 @@ CMD="wget -qO /root/install.sh http://$PROXMOX_IP:8888/install_rocketchat_in_vm.
 EXEC_RESPONSE=$(qm guest exec "$ROCKETCHAT_VM_ID" -- bash -c "$CMD")
 
 # 2. Витягуємо PID (ігноруємо пробіли)
-PID=$(echo "$EXEC_RESPONSE" | grep -oP '"pid":\s*\K\d+')
+PID=$(echo "$EXEC_RESPONSE" | grep -oP '"pid"\s*:\s*\K\d+')
 
 # Перевірка, чи вдалося запустити
 if [ -z "$PID" ]; then
