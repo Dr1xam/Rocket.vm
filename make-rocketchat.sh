@@ -120,7 +120,6 @@ trap cleanup EXIT
 
 # 2. КОМАНДА ДЛЯ ВІРТУАЛКИ
 # set -e зупинить виконання при першій же помилці
-echo "Виконую інсталяцію rocketchat на VM...(деталі пишуться в $DEPLOY_ROCKETCHAT_LOG_FILE)"
 cat > install_rocketchat_in_vm.sh <<EOF
 #!/bin/bash
 # Пишемо логи у файл всередині VM
