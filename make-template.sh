@@ -23,7 +23,7 @@ done
 
 # Перевірка результату
 if [ $? -eq 0 ]; then
-    echo -e "\nВідновлення завершено успішно."
+    echo -e "\nВідновлення завершено успішно"
     echo "Лог відновлення записано у файл: $MAKE_TEMPLATE_LOG_FILE"
 else
     echo "\n Виводжу повний лог помилки ($MAKE_TEMPLATE_LOG_FILE):"
