@@ -57,7 +57,7 @@ qm resize "$ROCKETCHAT_VM_ID" scsi0 "$ROCKETCHAT_DISK" >> "$DEPLOY_ROCKETCHAT_VM
 
 if [ $? -eq 0 ]; then
         echo -e "\nКлонування завершено успішно."
-    echo "Лог відновлення записано у файл: $DEPLOY_ROCKETCHAT_VM_LOG_FILE"
+    echo "Лог клонування записано у файл: $DEPLOY_ROCKETCHAT_VM_LOG_FILE"
 else
     echo "ПОМИЛКА"
     cat "$DEPLOY_ROCKETCHAT_VM_LOG_FILE"
@@ -101,7 +101,7 @@ if [ ! -f "$ROCKETCHAT_ARCHIVE_NAME" ]; then
     exit 1
 fi
 
-echo "Втановлення Rocketсhat на VM $ROCKETCHAT_VM_ID (rocketchat)"
+echo "Вcтановлення Rocketсhat на VM $ROCKETCHAT_VM_ID (rocketchat)"
 
 # 1. ЗАПУСКАЄМО ВЕБ-СЕРВЕР (з захистом cleanup)
 python3 -m http.server 8888 > /dev/null 2>&1 &
@@ -188,7 +188,7 @@ while true; do
         EXIT_CODE=$(echo "$STATUS_JSON" | grep -oP '"exitcode"\s*:\s*\K\d+')
 
         if [ "$EXIT_CODE" == "0" ]; then
-            echo -e "\nRocketchat встановленно"
+            echo -e "\nRocketchat встановлено"
             break # Виходимо з циклу, все добре
         else
             echo -e "\n ПОМИЛКА ІНСТАЛЯЦІЇ! Код виходу: $EXIT_CODE"
