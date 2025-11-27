@@ -1,6 +1,6 @@
 source vm.conf
 
-echo "Відновлення VM $TEMPLATE_VM_ID... (деталі пишуться в $MAKE_TEMPLATE_LOG_FILE)"
+echo "Відновлення VM $TEMPLATE_VM_ID (deploy-templatr) (деталі пишуться в $MAKE_TEMPLATE_LOG_FILE)"
 
 set -o pipefail
 
