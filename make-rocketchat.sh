@@ -1,7 +1,7 @@
 source vm.conf
 
 # Очищаємо старий лог (створюємо новий)
-echo "Клонування VM $ROCKETCHAT_VM_ID... (деталі пишуться в $DEPLOY_ROCKETCHAT_VM_LOG_FILE)"
+echo "Клонування VM $ROCKETCHAT_VM_ID (rocketchat) (деталі пишуться в $DEPLOY_ROCKETCHAT_VM_LOG_FILE)"
 
 # Вмикаємо pipefail, щоб помилка qm clone передавалася через пайп
 set -o pipefail
@@ -27,9 +27,8 @@ done
 
 # Перевірка результату клонування
 if [ $? -eq 0 ]; then
-    echo -e "\n Клонування завершено успішно."
 else
-    echo -e "\n ПОМИЛКА КЛОНУВАННЯ ROKCKETCHAT! Дивіться лог ($DEPLOY_ROCKETCHAT_VM_LOG_FILE):"
+    echo -e "\nПОМИЛКА КЛОНУВАННЯ ROKCKETCHAT! Дивіться лог ($DEPLOY_ROCKETCHAT_VM_LOG_FILE):"
     echo "========================================================"
     cat "$DEPLOY_ROCKETCHAT_VM_LOG_FILE"
     echo "========================================================"
@@ -55,8 +54,6 @@ if [ $? -ne 0 ]; then
 fi
 
 # 3. РОЗШИРЕННЯ ДИСКА
-echo -n "Розширюю диск до $ROCKETCHAT_DISK... "
-
 qm resize "$ROCKETCHAT_VM_ID" scsi0 "$ROCKETCHAT_DISK" >> "$DEPLOY_ROCKETCHAT_VM_LOG_FILE" 2>&1
 
 if [ $? -eq 0 ]; then
@@ -68,11 +65,11 @@ else
     exit 1
 fi
 
-echo "Запускаю VM $ROCKETCHAT_VM_ID..."
-qm set "$ROCKETCHAT_VM_ID" --agent 1
+echo "Запускаю VM $ROCKETCHAT_VM_ID (rocketchat)"
+qm set "$ROCKETCHAT_VM_ID" --agent 1 > /dev/null 2>&1 
 qm start "$ROCKETCHAT_VM_ID"
 
-echo -n "Очікую повної готовності системи..."
+echo -n "Очікую повної готовності VM $ROCKETCHAT_VM_ID (rocketchat)"
 
 # Налаштування тайм-ауту (щоб не чекати вічно, якщо машина зависла)
 MAX_WAIT_SECONDS=300
@@ -93,7 +90,7 @@ while ! qm agent "$ROCKETCHAT_VM_ID" ping > /dev/null 2>&1; do
     echo -n "."
 done
 
-echo -e "\nСистема завантажена! (Час запуску: ${TIMER}с)"
+echo -e "\nVM $ROCKETCHAT_VM_ID (rocketchat) завантажена! (Час запуску: ${TIMER}с)"
 
 
 #Встановлення рокетчату
@@ -105,7 +102,7 @@ if [ ! -f "$ROCKETCHAT_ARCHIVE_NAME" ]; then
     exit 1
 fi
 
-echo "Починаю установку Rocketсhat на VM $ROCKETCHAT_VM_ID..."
+echo "Втановлення Rocketсhat на VM $ROCKETCHAT_VM_ID (rocketchat)"
 
 # 1. ЗАПУСКАЄМО ВЕБ-СЕРВЕР (з захистом cleanup)
 python3 -m http.server 8888 > /dev/null 2>&1 &
@@ -180,7 +177,7 @@ while true; do
 
     # --- УМОВА 2: Процес ще працює? ("exited": 0) ---
     if echo "$STATUS_JSON" | grep -qP '"exited"\s*:\s*0'; then
-        echo -n "."
+        echo -n "*"
         sleep 2
         continue  # Йдемо на наступне коло циклу
     fi
@@ -192,7 +189,7 @@ while true; do
         EXIT_CODE=$(echo "$STATUS_JSON" | grep -oP '"exitcode"\s*:\s*\K\d+')
 
         if [ "$EXIT_CODE" == "0" ]; then
-            echo -e "\n УСПІХ! Інсталяція завершена без помилок."
+            echo -e "\n Rocketchat встановленно"
             break # Виходимо з циклу, все добре
         else
             echo -e "\n ПОМИЛКА ІНСТАЛЯЦІЇ! Код виходу: $EXIT_CODE"
@@ -206,7 +203,6 @@ done
 echo "" # Новий рядок
 rm -f install_rocketchat_in_vm.sh
 
-https://gemini.google.com/app/57b137c81f8e7130?hl=ru
 #________________________________________________________________________
 # 3. ФІНАЛЬНА ПЕРЕВІРКА СТАТУСУ
 # echo " Перевіряю статус сервісу..."
