@@ -26,8 +26,7 @@ while IFS= read -r line; do
 done
 
 # Перевірка результату клонування
-if [ $? -eq 0 ]; then
-else
+if [! $? -eq 0 ]; then
     echo -e "\nПОМИЛКА КЛОНУВАННЯ ROKCKETCHAT! Дивіться лог ($DEPLOY_ROCKETCHAT_VM_LOG_FILE):"
     echo "========================================================"
     cat "$DEPLOY_ROCKETCHAT_VM_LOG_FILE"
