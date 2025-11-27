@@ -188,7 +188,7 @@ while true; do
         EXIT_CODE=$(echo "$STATUS_JSON" | grep -oP '"exitcode"\s*:\s*\K\d+')
 
         if [ "$EXIT_CODE" == "0" ]; then
-            echo -e "\n Rocketchat встановленно"
+            echo -e "\nRocketchat встановленно"
             break # Виходимо з циклу, все добре
         else
             echo -e "\n ПОМИЛКА ІНСТАЛЯЦІЇ! Код виходу: $EXIT_CODE"
