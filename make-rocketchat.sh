@@ -153,7 +153,7 @@ rm -rf $ROCKETCHAT_VM_INSTALLATION_DIR
 EOF
 
 CMD="wget -qO /root/install.sh http://$PROXMOX_IP:8888/install_rocketchat_in_vm.sh && chmod +x /root/install.sh && /root/install.sh > /dev/null 2>&1"
-EXEC_RESPONSE=$(qm guest exec "$ROCKETCHAT_VM_ID" -- bash -c "$CMD" 2>&1)
+EXEC_RESPONSE=$(qm guest exec "$ROCKETCHAT_VM_ID" --timeout 1 -- bash -c "$CMD" 2>&1)
 
 # 3. ВИТЯГУЄМО PID
 PID=$(echo "$EXEC_RESPONSE" | grep -oP '"pid"\s*:\s*\K\d+')
@@ -163,8 +163,6 @@ if [ -z "$PID" ]; then
     echo "Відповідь: $EXEC_RESPONSE"
     exit 1
 fi
-
-echo "Процес пішов (PID: $PID). Чекаю завершення..."
 
 # 4. ЦИКЛ ОЧІКУВАННЯ
 while true; do
@@ -208,7 +206,7 @@ done
 echo "" # Новий рядок
 rm -f install_rocketchat_in_vm.sh
 
-
+https://gemini.google.com/app/57b137c81f8e7130?hl=ru
 #________________________________________________________________________
 # 3. ФІНАЛЬНА ПЕРЕВІРКА СТАТУСУ
 # echo " Перевіряю статус сервісу..."
@@ -219,7 +217,7 @@ rm -f install_rocketchat_in_vm.sh
 
 # if [[ -n "$STATUS_CHECK" ]]; then
 #     echo " УСПІХ! Rocket.Chat встановлено і він АКТИВНИЙ."
-#     # Виводимо порти для певності
+#     # Виводимо порти для певностіhttps://gemini.google.com/app/57b137c81f8e7130?hl=ru
 #     qm guest exec "$VM_ID" -- ss -tulpn | grep 3000
 # else
 #     echo " Увага: Установка пройшла, але сервіс не активний. Перевірте логи:"
