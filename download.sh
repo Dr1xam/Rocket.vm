@@ -82,13 +82,12 @@ aria2c -i "$ARIA_INPUT" \
 ARIA_PID=$!
 
 # --- Ініціалізація змінних ---
-# START_TIME - час старту для розрахунку загального часу, що минув
 START_TIME=$(date +%s)
 
-# INTERVAL_COUNTER - лічильник зворотного відліку. Коли 0, оновлюємо 2-секундні дані
+# Лічильник для оновлення швидкості (починаємо з 1, щоб порахувати одразу)
 INTERVAL_COUNTER=1
 
-# Ініціалізуємо волатильні змінні для першого виводу
+# Початкові значення
 HUMAN_SPEED="--- MiB/s"
 HUMAN_ETA="---"
 # -----------------------------
@@ -101,41 +100,40 @@ while kill -0 "$ARIA_PID" 2>/dev/null; do
     CURRENT_BYTES=$(du -sb "$TEMP_DIR" 2>/dev/null | cut -f1)
     if [ -z "$CURRENT_BYTES" ]; then CURRENT_BYTES=0; fi
 
-    # 1a. Час, що минув (ELAPSED TIME)
+    # 1a. Час, що минув
     ELAPSED_TIME_SECONDS=$((CURRENT_TIME - START_TIME))
     EH=$((ELAPSED_TIME_SECONDS / 3600))
     EM=$(( (ELAPSED_TIME_SECONDS % 3600) / 60 ))
     ES=$(( ELAPSED_TIME_SECONDS % 60 ))
     HUMAN_ELAPSED_TIME=$(printf "%02d:%02d:%02d" $EH $EM $ES)
 
-    # 1b. Прогрес та розмір (як раніше)
+    # 1b. Прогрес
     if [ "$TOTAL_BYTES" -gt 0 ]; then PERCENT=$(( 100 * CURRENT_BYTES / TOTAL_BYTES )); else PERCENT=0; fi
     if [ "$PERCENT" -gt 100 ]; then PERCENT=100; fi
-    CHARS=$(( PERCENT / 2 )); BAR=""; 
+    CHARS=$(( PERCENT / 5 )); BAR=""; 
     for ((i=0; i<CHARS; i++)); do BAR="${BAR}#"; done
     for ((i=CHARS; i<20; i++)); do BAR="${BAR}."; done
     HUMAN_SIZE=$(du -sh "$TEMP_DIR" 2>/dev/null | cut -f1)
 
-    # 2. ВОЛАТИЛЬНІ МЕТРИКИ (Оновлюються кожні 2 секунд)
-    if [ "$INTERVAL_COUNTER" -eq 1 ]; then 
+    # 2. ВОЛАТИЛЬНІ МЕТРИКИ (Оновлюються кожні 2 секунди)
+    if [ "$INTERVAL_COUNTER" -le 1 ]; then 
         
-        # 2a. Середня швидкість (для достовірного прогнозу)
+        # 2a. Середня швидкість
         if [ "$ELAPSED_TIME_SECONDS" -gt 0 ]; then
              AVG_SPEED_BPS=$((CURRENT_BYTES / ELAPSED_TIME_SECONDS))
         else
              AVG_SPEED_BPS=1
         fi
 
-        # 2b. Обчислення ETA
+        # 2b. ETA
         REMAINING_BYTES=$((TOTAL_BYTES - CURRENT_BYTES))
-        
         if [ "$AVG_SPEED_BPS" -gt 0 ]; then
             ETA_SECONDS=$((REMAINING_BYTES / AVG_SPEED_BPS))
         else
             ETA_SECONDS=999999999
         fi
 
-        # 2c. Форматування швидкості (MiB/s, використовуємо AVG_SPEED_BPS)
+        # 2c. Форматування швидкості
         if [ "$AVG_SPEED_BPS" -ge 1048576 ]; then
             HUMAN_SPEED="$(echo "scale=2; $AVG_SPEED_BPS / 1048576" | bc) MiB/s"
         elif [ "$AVG_SPEED_BPS" -ge 1024 ]; then
@@ -144,7 +142,7 @@ while kill -0 "$ARIA_PID" 2>/dev/null; do
             HUMAN_SPEED="${AVG_SPEED_BPS} B/s"
         fi
 
-        # 2d. Форматування ETA (h:m:s)
+        # 2d. Форматування ETA
         if [ "$ETA_SECONDS" -lt 999999999 ]; then
             H=$((ETA_SECONDS / 3600))
             M=$(( (ETA_SECONDS % 3600) / 60 ))
@@ -161,12 +159,12 @@ while kill -0 "$ARIA_PID" 2>/dev/null; do
             HUMAN_ETA="---"
         fi
         
-        # Скидаємо лічильник
+        # Скидаємо лічильник на 2 секунди
         INTERVAL_COUNTER=2 
     fi
 
-    # 3. ВИВІД (Використовуємо всі змінні)
-    echo -ne "\rЗавантаження: ${HUMAN_SIZE} [${BAR}] ${PERCENT}% | ${HUMAN_SPEED} | Час: ${HUMAN_ELAPSED_TIME} | ETA: ${HUMAN_ETA}   \033[K"
+    # 3. ВИВІД
+    echo -ne "\rЗавантаження: [${TOTAL_SIZE_GB} ${BAR}]/${HUMAN_SIZE} ${PERCENT}% | ${HUMAN_SPEED} | Час: ${HUMAN_ELAPSED_TIME} | ETA: ${HUMAN_ETA}   \033[K"
     
     sleep 1
     
