@@ -81,53 +81,54 @@ aria2c -i "$ARIA_INPUT" \
 
 ARIA_PID=$!
 
-# --- Ініціалізація змінних для швидкості та ETA ---
+# --- Ініціалізація змінних ---
 PREVIOUS_BYTES=0
 LAST_CHECK_TIME=$(date +%s)
-# ----------------------------------------------------
+START_TIME=$LAST_CHECK_TIME # Час, коли почався весь процес завантаження
+# -----------------------------
 
 
 # 2. ЦИКЛ ЗІ СМУЖКОЮ ПРОГРЕСУ
 while kill -0 "$ARIA_PID" 2>/dev/null; do
     
-    # 2a. Обчислення швидкості
+    # 1. ЗАВАНТАЖЕННЯ ДАНИХ ТА ЧЕКАННЯ (5 секунд)
+    sleep 5 # <--- ФІКСОВАНА ЗАТРИМКА ДЛЯ СТАБІЛЬНОСТІ
+    
     CURRENT_TIME=$(date +%s)
     CURRENT_BYTES=$(du -sb "$TEMP_DIR" 2>/dev/null | cut -f1)
     
     if [ -z "$CURRENT_BYTES" ]; then CURRENT_BYTES=0; fi
 
-    TIME_DELTA=$((CURRENT_TIME - LAST_CHECK_TIME))
-
-    if [ "$TIME_DELTA" -gt 0 ]; then
-        # Швидкість у байтах за секунду
-        SPEED_BPS=$(( (CURRENT_BYTES - PREVIOUS_BYTES) / TIME_DELTA ))
+    # 2. КАЛЬКУЛЯЦІЯ СЕРЕДНЬОЇ ШВИДКОСТІ (для достовірного прогнозу)
+    TOTAL_TIME_ELAPSED=$((CURRENT_TIME - START_TIME))
+    
+    if [ "$TOTAL_TIME_ELAPSED" -gt 0 ]; then
+        # AVG_SPEED_BPS - середня швидкість з початку запуску (це найстабільніший показник)
+        AVG_SPEED_BPS=$((CURRENT_BYTES / TOTAL_TIME_ELAPSED))
     else
-        SPEED_BPS=0
+        AVG_SPEED_BPS=1 # Захист від ділення на нуль
     fi
     
-    # 2b. Обчислення ETA
+    # 3. Обчислення ETA та Форматування
     REMAINING_BYTES=$((TOTAL_BYTES - CURRENT_BYTES))
-    if [ "$SPEED_BPS" -gt 0 ]; then
-        ETA_SECONDS=$((REMAINING_BYTES / SPEED_BPS))
-    else
-        ETA_SECONDS=0 
-    fi
-
-    # 2c. Форматування швидкості (ручне KiB/s, MiB/s)
     
-    # Визначаємо, чи потрібна нам MiB/s чи KiB/s
-    if [ "$SPEED_BPS" -ge 1048576 ]; then
-        # Формат MiB/s (1024*1024). scale=2 для двох знаків після коми.
-        HUMAN_SPEED="$(echo "scale=2; $SPEED_BPS / 1048576" | bc) MiB/s"
-    elif [ "$SPEED_BPS" -ge 1024 ]; then
-        # Формат KiB/s (1024). scale=1 для одного знака після коми.
-        HUMAN_SPEED="$(echo "scale=1; $SPEED_BPS / 1024" | bc) KiB/s"
+    if [ "$AVG_SPEED_BPS" -gt 0 ]; then
+        ETA_SECONDS=$((REMAINING_BYTES / AVG_SPEED_BPS))
     else
-        HUMAN_SPEED="${SPEED_BPS} B/s"
+        ETA_SECONDS=999999999 # Нескінченність
     fi
 
-    # 2d. Форматування ETA (h:m:s) - ЦЕЙ БЛОК БЕЗ ЗМІН, БО ЧАС ЦІЛОЧИСЕЛЬНИЙ
-    if [ "$ETA_SECONDS" -gt 0 ]; then
+    # 4. Форматування швидкості (MiB/s, використовуємо AVG_SPEED_BPS)
+    if [ "$AVG_SPEED_BPS" -ge 1048576 ]; then
+        HUMAN_SPEED="$(echo "scale=2; $AVG_SPEED_BPS / 1048576" | bc) MiB/s"
+    elif [ "$AVG_SPEED_BPS" -ge 1024 ]; then
+        HUMAN_SPEED="$(echo "scale=1; $AVG_SPEED_BPS / 1024" | bc) KiB/s"
+    else
+        HUMAN_SPEED="${AVG_SPEED_BPS} B/s"
+    fi
+
+    # 5. Форматування ETA (h:m:s)
+    if [ "$ETA_SECONDS" -gt 0 ] && [ "$ETA_SECONDS" -lt 999999999 ]; then
         H=$((ETA_SECONDS / 3600))
         M=$(( (ETA_SECONDS % 3600) / 60 ))
         S=$(( ETA_SECONDS % 60 ))
@@ -143,19 +144,9 @@ while kill -0 "$ARIA_PID" 2>/dev/null; do
         HUMAN_ETA="---"
     fi
 
-    # 2e. Оновлення змінних для наступної ітерації
-    PREVIOUS_BYTES=$CURRENT_BYTES
-    LAST_CHECK_TIME=$CURRENT_TIME
-
-    # Рахуємо відсотки (логіка з попереднього прикладу)
-    if [ "$TOTAL_BYTES" -gt 0 ]; then
-        PERCENT=$(( 100 * CURRENT_BYTES / TOTAL_BYTES ))
-    else
-        PERCENT=0
-    fi
-    
+    # 6. Малюємо смужку
+    if [ "$TOTAL_BYTES" -gt 0 ]; then PERCENT=$(( 100 * CURRENT_BYTES / TOTAL_BYTES )); else PERCENT=0; fi
     if [ "$PERCENT" -gt 100 ]; then PERCENT=100; fi
-
     CHARS=$(( PERCENT / 5 )) 
     BAR=""
     for ((i=0; i<CHARS; i++)); do BAR="${BAR}#"; done
@@ -163,10 +154,13 @@ while kill -0 "$ARIA_PID" 2>/dev/null; do
 
     HUMAN_SIZE=$(du -sh "$TEMP_DIR" 2>/dev/null | cut -f1)
 
-    # Виводимо рядок з усіма даними
-    echo -ne "\rЗавантаження: [${BAR}] ${PERCENT}%  (${HUMAN_SIZE} @ ${HUMAN_SPEED} | ETA: ${HUMAN_ETA})   \033[K"
+    # 7. Вивід на екран
+    echo -ne "\r⬇️  Завантаження: [${BAR}] ${PERCENT}%  (${HUMAN_SIZE} @ ${HUMAN_SPEED} | ETA: ${HUMAN_ETA})   \033[K"
     
-    sleep 3
+    # Оновлення змінних для наступного циклу (хоча вони тут не використовуються, для чистоти коду)
+    PREVIOUS_BYTES=$CURRENT_BYTES
+    LAST_CHECK_TIME=$CURRENT_TIME
+    
 done
 
 # 3. ОТРИМАННЯ КОДУ ЗАВЕРШЕННЯ
