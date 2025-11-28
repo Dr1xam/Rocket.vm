@@ -114,17 +114,19 @@ while kill -0 "$ARIA_PID" 2>/dev/null; do
     fi
 
     # 2c. Форматування швидкості (ручне KiB/s, MiB/s)
+    
+    # Визначаємо, чи потрібна нам MiB/s чи KiB/s
     if [ "$SPEED_BPS" -ge 1048576 ]; then
-        # Формат MiB/s (1024*1024)
-        HUMAN_SPEED="$(($SPEED_BPS / 1048576)).$(($((SPEED_BPS % 1048576)) / 104857)) MiB/s"
+        # Формат MiB/s (1024*1024). scale=2 для двох знаків після коми.
+        HUMAN_SPEED="$(echo "scale=2; $SPEED_BPS / 1048576" | bc) MiB/s"
     elif [ "$SPEED_BPS" -ge 1024 ]; then
-        # Формат KiB/s
-        HUMAN_SPEED="$(($SPEED_BPS / 1024)) KiB/s"
+        # Формат KiB/s (1024). scale=1 для одного знака після коми.
+        HUMAN_SPEED="$(echo "scale=1; $SPEED_BPS / 1024" | bc) KiB/s"
     else
         HUMAN_SPEED="${SPEED_BPS} B/s"
     fi
 
-    # 2d. Форматування ETA (h:m:s)
+    # 2d. Форматування ETA (h:m:s) - ЦЕЙ БЛОК БЕЗ ЗМІН, БО ЧАС ЦІЛОЧИСЕЛЬНИЙ
     if [ "$ETA_SECONDS" -gt 0 ]; then
         H=$((ETA_SECONDS / 3600))
         M=$(( (ETA_SECONDS % 3600) / 60 ))
