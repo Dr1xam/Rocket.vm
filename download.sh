@@ -52,6 +52,7 @@ echo "Початок завантаження шаблону для віртуа
 #     exit 1
 # fi
 
+wget -q --show-progress "$URL_ROCKETCHAT"
 wget -q  -O - $URL_SRC | tar -xz
 
 #Перевірка чи завантажено скріпти
