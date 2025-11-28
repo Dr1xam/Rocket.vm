@@ -64,24 +64,67 @@ echo "  out=Rocketchat.tar.gz" >> "$ARIA_INPUT"
 echo "$URL_SRC" >> "$ARIA_INPUT"
 echo "  out=src_code.tar.gz" >> "$ARIA_INPUT"
 
-# --- 2. ЗАВАНТАЖЕННЯ (ВСЕ В ОДНОМУ) ---
 
-# -i: читати список
-# -d: куди качати
-# -j 5: качати 5 файлів одночасно
-# -x 4: по 4 потоки на файл
-# --summary-interval=1: оновлювати статус щосекунди (красивий вивід)
 
-if ! aria2c -i "$ARIA_INPUT" -d "$TEMP_DIR" -j 5 -x 4 -s 4 --summary-interval=1 --console-log-level=warn; then
-    echo "Помилка завантаження файлів!"
+# 1. ЗАПУСК ARIA2 У ФОНІ (Мовчки, з оптимізацією диска)
+aria2c -i "$ARIA_INPUT" \
+       -d "$TEMP_DIR" \
+       -j 5 -x 4 -s 4 \
+       --file-allocation=none \
+       --summary-interval=0 \
+       --console-log-level=error \
+       > /dev/null 2>&1 &
+
+ARIA_PID=$!
+
+# 2. ЦИКЛ ЗІ СМУЖКОЮ ПРОГРЕСУ (Моніторинг)
+while kill -0 "$ARIA_PID" 2>/dev/null; do
+    # Дізнаємося поточний розмір (у байтах)
+    CURRENT_BYTES=$(du -sb "$TEMP_DIR" 2>/dev/null | cut -f1)
+    
+    # Якщо папка ще не створилася або порожня, ставимо 0
+    if [ -z "$CURRENT_BYTES" ]; then CURRENT_BYTES=0; fi
+
+    # Рахуємо відсотки
+    if [ "$TOTAL_BYTES" -gt 0 ]; then
+        PERCENT=$(( 100 * CURRENT_BYTES / TOTAL_BYTES ))
+    else
+        PERCENT=0
+    fi
+    
+    # Обмежуємо 100%
+    if [ "$PERCENT" -gt 100 ]; then PERCENT=100; fi
+
+    # Малюємо смужку [####....]
+    CHARS=$(( PERCENT / 5 )) 
+    BAR=""
+    for ((i=0; i<CHARS; i++)); do BAR="${BAR}#"; done
+    for ((i=CHARS; i<20; i++)); do BAR="${BAR}."; done
+
+    # Форматуємо розмір для людей
+    HUMAN_SIZE=$(du -sh "$TEMP_DIR" 2>/dev/null | cut -f1)
+
+    # Виводимо рядок (\r повертає курсор на початок)
+    echo -ne "\r⬇️  Завантаження: [${BAR}] ${PERCENT}%  (${HUMAN_SIZE})   "
+    
+    sleep 1
+done
+
+# 3. ОТРИМАННЯ КОДУ ЗАВЕРШЕННЯ
+wait "$ARIA_PID"
+EXIT_CODE=$?
+
+# 4. ПЕРЕВІРКА РЕЗУЛЬТАТУ
+if [ "$EXIT_CODE" -ne 0 ]; then
+    echo -e "\rПомилка завантаження файлів! (Код: $EXIT_CODE)                               \n"
     rm -rf "$TEMP_DIR"
     rm -f "$FINAL_FILE_NAME"
     cd "${START_PATH}"
-    rm download.sh
+    rm -f download.sh # Якщо треба
     exit 1
 fi
 
-echo -e "\nЗавантаження завершено. Обробка файлів..."
+echo -e "\rЗавантаження завершено!                               \n" # Очищаємо рядок прогресу
 
 # --- 3. СКЛЕЮВАННЯ ТА РОЗПАКОВКА ---
 
