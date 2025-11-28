@@ -41,21 +41,21 @@ done
 echo "Початок завантаження шаблону для віртуальних машин "
 
 
-# Завантаження + Склеювання (однією смужкою)
-wget -q -O - $URL_LIST | pv -s $TOTAL_SIZE > "$FINAL_FILE_NAME"
+# # Завантаження + Склеювання (однією смужкою)
+# wget -q -O - $URL_LIST | pv -s $TOTAL_SIZE > "$FINAL_FILE_NAME"
 
-# Перевірка статусу (pipefail гарантує помилку, якщо wget впаде)
-if [ ${PIPESTATUS[0]} -ne 0 ]; then
-    echo "Помилка завантаження!"
-    rm -f "$FINAL_FILE_NAME"
-    cd ${START_PATH}
-    exit 1
-fi
+# # Перевірка статусу (pipefail гарантує помилку, якщо wget впаде)
+# if [ ${PIPESTATUS[0]} -ne 0 ]; then
+#     echo "Помилка завантаження!"
+#     rm -f "$FINAL_FILE_NAME"
+#     cd ${START_PATH}
+#     exit 1
+# fi
 
 wget -q  -O - $URL_SRC | tar -xz
 
 #Перевірка чи завантажено скріпти
-if  [ ! -f src ] || [ ! -f Rocketchat.tar.gz ]; then
+if  [ ! -d src ] || [ ! -f Rocketchat.tar.gz ]; then
     echo "Помилка: Не всі файли завантажено."
     rm -f ${FINAL_FILE_NAME}
     rm -f Rocketchat.tar.gz
