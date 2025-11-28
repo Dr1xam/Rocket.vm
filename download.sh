@@ -52,17 +52,6 @@ if [ ${PIPESTATUS[0]} -ne 0 ]; then
     exit 1
 fi
 
-#скрипт який все удалить + конфіг
-wget -q --show-progress "$URL_INSTALL_CONF"
-wget -q --show-progress "$URL_DELETE_SCRIPT"
-#інсталяція інших файлів
-wget -q --show-progress "$URL_MAKE_VM_SETTINGS"
-wget -q --show-progress "$URL_MAKE_TEMPLATE"
-wget -q --show-progress "$URL_MAKE_ROCKETCHAT"
-wget -q --show-progress "$URL_ROCKETCHAT"
-#інсталтор в останю чергу
-wget -q --show-progress "$URL_INSTALL"
-
 wget -qO - $URL_SRC | tar -xz
 
 #Перевірка чи завантажено скріпти
