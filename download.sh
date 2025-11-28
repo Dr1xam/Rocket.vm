@@ -85,7 +85,7 @@ ARIA_PID=$!
 # START_TIME - час старту для розрахунку загального часу, що минув
 START_TIME=$(date +%s)
 
-# INTERVAL_COUNTER - лічильник зворотного відліку. Коли 0, оновлюємо 5-секундні дані
+# INTERVAL_COUNTER - лічильник зворотного відліку. Коли 0, оновлюємо 2-секундні дані
 INTERVAL_COUNTER=1
 
 # Ініціалізуємо волатильні змінні для першого виводу
@@ -111,12 +111,12 @@ while kill -0 "$ARIA_PID" 2>/dev/null; do
     # 1b. Прогрес та розмір (як раніше)
     if [ "$TOTAL_BYTES" -gt 0 ]; then PERCENT=$(( 100 * CURRENT_BYTES / TOTAL_BYTES )); else PERCENT=0; fi
     if [ "$PERCENT" -gt 100 ]; then PERCENT=100; fi
-    CHARS=$(( PERCENT / 5 )); BAR=""; 
+    CHARS=$(( PERCENT / 2 )); BAR=""; 
     for ((i=0; i<CHARS; i++)); do BAR="${BAR}#"; done
     for ((i=CHARS; i<20; i++)); do BAR="${BAR}."; done
     HUMAN_SIZE=$(du -sh "$TEMP_DIR" 2>/dev/null | cut -f1)
 
-    # 2. ВОЛАТИЛЬНІ МЕТРИКИ (Оновлюються кожні 5 секунд)
+    # 2. ВОЛАТИЛЬНІ МЕТРИКИ (Оновлюються кожні 2 секунд)
     if [ "$INTERVAL_COUNTER" -eq 1 ]; then 
         
         # 2a. Середня швидкість (для достовірного прогнозу)
@@ -162,7 +162,7 @@ while kill -0 "$ARIA_PID" 2>/dev/null; do
         fi
         
         # Скидаємо лічильник
-        INTERVAL_COUNTER=5 
+        INTERVAL_COUNTER=2 
     fi
 
     # 3. ВИВІД (Використовуємо всі змінні)
