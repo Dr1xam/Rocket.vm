@@ -164,7 +164,7 @@ while kill -0 "$ARIA_PID" 2>/dev/null; do
     fi
 
     # 3. ВИВІД
-    echo -ne "\rЗавантаження: ${TOTAL_SIZE_GB}G/${HUMAN_SIZE} [${BAR}] ${PERCENT}% | ${HUMAN_SPEED} | Час: ${HUMAN_ELAPSED_TIME} | ETA: ${HUMAN_ETA}   \033[K"
+    echo -ne "\rЗавантаження: ${HUMAN_SIZE}/${TOTAL_SIZE_GB}G [${BAR}] ${PERCENT}% | ${HUMAN_SPEED} | Час: ${HUMAN_ELAPSED_TIME} | ETA: ${HUMAN_ETA}   \033[K"
     
     sleep 1
     
