@@ -105,7 +105,7 @@ while kill -0 "$ARIA_PID" 2>/dev/null; do
     HUMAN_SIZE=$(du -sh "$TEMP_DIR" 2>/dev/null | cut -f1)
 
     # Виводимо рядок (\r повертає курсор на початок)
-    echo -ne "\r⬇️  Завантаження: [${BAR}] ${PERCENT}%  (${HUMAN_SIZE})   "
+    echo -ne "\rЗавантаження: [${BAR}] ${PERCENT}%  (${HUMAN_SIZE})   \033[K"
     
     sleep 1
 done
