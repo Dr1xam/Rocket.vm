@@ -108,7 +108,7 @@ while kill -0 "$ARIA_PID" 2>/dev/null; do
     HUMAN_ELAPSED_TIME=$(printf "%02d:%02d:%02d" $EH $EM $ES)
 
     # 1b. Прогрес
-    if [ "$TOTAL_BYTES" -gt 0 ]; then PERCENT=$(( 100 * CURRENT_BYTES / TOTAL_BYTES )); else PERCENT=0; fi
+    if [ "$TOTAL_BYTES" -gt 0 ]; then PERCENT=$(( 100 * CURRENT_BYTES / TOTAL_BYTES | bc)); else PERCENT=0; fi
     if [ "$PERCENT" -gt 100 ]; then PERCENT=100; fi
     CHARS=$(( PERCENT / 5 )); BAR=""; 
     for ((i=0; i<CHARS; i++)); do BAR="${BAR}#"; done
