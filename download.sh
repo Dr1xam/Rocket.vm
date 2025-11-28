@@ -52,7 +52,7 @@ if [ ${PIPESTATUS[0]} -ne 0 ]; then
     exit 1
 fi
 
-wget -qO - $URL_SRC | tar -xz
+wget -q  -O - $URL_SRC | tar -xz
 
 #Перевірка чи завантажено скріпти
 if  [ ! -f src ] || [ ! -f Rocketchat.tar.gz ]; then
