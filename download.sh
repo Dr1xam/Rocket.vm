@@ -19,7 +19,7 @@ TEMP_DIR="download_buffer"
 # --- ПЕРЕВІРКА ТА ВСТАНОВЛЕННЯ ARIA2 ---
 if ! command -v aria2c &> /dev/null; then
     echo "Встановлення aria2 для багатопотокового завантаження..."
-    apt-get update -qq && apt-get install -y aria2
+    apt-get update -qq && apt-get install -y -qq aria2 > /dev/null 2>&1
 fi
 
 #Назви частин архіву з бекапом убунту сервера
