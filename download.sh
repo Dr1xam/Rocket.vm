@@ -36,7 +36,7 @@ for suffix in "${SUFFIXES[@]}"; do
   URL_LIST="${URL_LIST} ${URL_PARTS}${PART_PREFIX}${suffix}"
 done
 
-TOTAL_SIZE_GB="2.69"
+TOTAL_SIZE_GB="2.68"
 TOTAL_BYTES=$(echo "scale=0; $TOTAL_SIZE_GB * 1073741824 / 1" | bc)
 
 echo "Початок завантаження інсталятора"
