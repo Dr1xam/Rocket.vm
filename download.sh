@@ -178,16 +178,6 @@ done
 wait "$ARIA_PID"
 EXIT_CODE=$?
 
-# 4. ПЕРЕВІРКА РЕЗУЛЬТАТУ
-if [ "$EXIT_CODE" -ne 0 ]; then
-    echo -e "\rПомилка завантаження файлів! (Код: $EXIT_CODE)                               \n"
-    rm -rf "$TEMP_DIR"
-    rm -f "$FINAL_FILE_NAME"
-    cd "${START_PATH}"
-    rm -f download.sh # Якщо треба
-    exit 1
-fi
-
 #echo -e "\rЗавантаження завершено!                               \n" # Очищаємо рядок прогресу
 
 # --- 3. СКЛЕЮВАННЯ ТА РОЗПАКОВКА ---
@@ -210,6 +200,7 @@ if [ ! -d "src" ] || [ ! -f "Rocketchat.tar.gz" ] || [ ! -s "$FINAL_FILE_NAME" ]
     echo "Помилка: Перевірка цілісності файлів не пройшла."
     
     # Видаляємо биті файли
+    rm -rf "$TEMP_DIR"
     rm -f "$FINAL_FILE_NAME"
     rm -f "Rocketchat.tar.gz"
     rm -rf src
