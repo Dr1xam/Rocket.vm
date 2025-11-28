@@ -70,6 +70,7 @@ echo "  out=src_code.tar.gz" >> "$ARIA_INPUT"
 
 
 # 1. ЗАПУСК ARIA2 У ФОНІ (Мовчки, з оптимізацією диска)
+# 1. ЗАПУСК ARIA2 У ФОНІ
 aria2c -i "$ARIA_INPUT" \
        -d "$TEMP_DIR" \
        -j 5 -x 4 -s 4 \
@@ -80,35 +81,88 @@ aria2c -i "$ARIA_INPUT" \
 
 ARIA_PID=$!
 
-# 2. ЦИКЛ ЗІ СМУЖКОЮ ПРОГРЕСУ (Моніторинг)
+# --- Ініціалізація змінних для швидкості та ETA ---
+PREVIOUS_BYTES=0
+LAST_CHECK_TIME=$(date +%s)
+# ----------------------------------------------------
+
+
+# 2. ЦИКЛ ЗІ СМУЖКОЮ ПРОГРЕСУ
 while kill -0 "$ARIA_PID" 2>/dev/null; do
-    # Дізнаємося поточний розмір (у байтах)
+    
+    # 2a. Обчислення швидкості
+    CURRENT_TIME=$(date +%s)
     CURRENT_BYTES=$(du -sb "$TEMP_DIR" 2>/dev/null | cut -f1)
     
-    # Якщо папка ще не створилася або порожня, ставимо 0
     if [ -z "$CURRENT_BYTES" ]; then CURRENT_BYTES=0; fi
 
-    # Рахуємо відсотки
+    TIME_DELTA=$((CURRENT_TIME - LAST_CHECK_TIME))
+
+    if [ "$TIME_DELTA" -gt 0 ]; then
+        # Швидкість у байтах за секунду
+        SPEED_BPS=$(( (CURRENT_BYTES - PREVIOUS_BYTES) / TIME_DELTA ))
+    else
+        SPEED_BPS=0
+    fi
+    
+    # 2b. Обчислення ETA
+    REMAINING_BYTES=$((TOTAL_BYTES - CURRENT_BYTES))
+    if [ "$SPEED_BPS" -gt 0 ]; then
+        ETA_SECONDS=$((REMAINING_BYTES / SPEED_BPS))
+    else
+        ETA_SECONDS=0 
+    fi
+
+    # 2c. Форматування швидкості (ручне KiB/s, MiB/s)
+    if [ "$SPEED_BPS" -ge 1048576 ]; then
+        # Формат MiB/s (1024*1024)
+        HUMAN_SPEED="$(($SPEED_BPS / 1048576)).$(($((SPEED_BPS % 1048576)) / 104857)) MiB/s"
+    elif [ "$SPEED_BPS" -ge 1024 ]; then
+        # Формат KiB/s
+        HUMAN_SPEED="$(($SPEED_BPS / 1024)) KiB/s"
+    else
+        HUMAN_SPEED="${SPEED_BPS} B/s"
+    fi
+
+    # 2d. Форматування ETA (h:m:s)
+    if [ "$ETA_SECONDS" -gt 0 ]; then
+        H=$((ETA_SECONDS / 3600))
+        M=$(( (ETA_SECONDS % 3600) / 60 ))
+        S=$(( ETA_SECONDS % 60 ))
+        
+        if [ $H -gt 0 ]; then
+             HUMAN_ETA=$(printf "%dч %02dхв %02dс" $H $M $S)
+        elif [ $M -gt 0 ]; then
+             HUMAN_ETA=$(printf "%02dхв %02dс" $M $S)
+        else
+             HUMAN_ETA=$(printf "%02dс" $S)
+        fi
+    else
+        HUMAN_ETA="---"
+    fi
+
+    # 2e. Оновлення змінних для наступної ітерації
+    PREVIOUS_BYTES=$CURRENT_BYTES
+    LAST_CHECK_TIME=$CURRENT_TIME
+
+    # Рахуємо відсотки (логіка з попереднього прикладу)
     if [ "$TOTAL_BYTES" -gt 0 ]; then
         PERCENT=$(( 100 * CURRENT_BYTES / TOTAL_BYTES ))
     else
         PERCENT=0
     fi
     
-    # Обмежуємо 100%
     if [ "$PERCENT" -gt 100 ]; then PERCENT=100; fi
 
-    # Малюємо смужку [####....]
     CHARS=$(( PERCENT / 5 )) 
     BAR=""
     for ((i=0; i<CHARS; i++)); do BAR="${BAR}#"; done
     for ((i=CHARS; i<20; i++)); do BAR="${BAR}."; done
 
-    # Форматуємо розмір для людей
     HUMAN_SIZE=$(du -sh "$TEMP_DIR" 2>/dev/null | cut -f1)
 
-    # Виводимо рядок (\r повертає курсор на початок)
-    echo -ne "\rЗавантаження: [${BAR}] ${PERCENT}%  (${HUMAN_SIZE})   \033[K"
+    # Виводимо рядок з усіма даними
+    echo -ne "\rЗавантаження: [${BAR}] ${PERCENT}%  (${HUMAN_SIZE} @ ${HUMAN_SPEED} | ETA: ${HUMAN_ETA})   \033[K"
     
     sleep 1
 done
