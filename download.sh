@@ -44,6 +44,8 @@ set -e
 # Створюємо тимчасову папку для буфера
 mkdir -p "$TEMP_DIR"
 ARIA_INPUT="$TEMP_DIR/input_urls.txt"
+
+: > "$ARIA_INPUT"
 # --- 1. ГЕНЕРАЦІЯ ФАЙЛУ ЗАВДАНЬ ДЛЯ ARIA2 ---
 # aria2 підтримує формат: URL (новий рядок) out=filename
 # А) Додаємо шматочки великого архіву
