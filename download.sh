@@ -42,7 +42,7 @@ echo "Початок завантаження шаблону для віртуа
 
 
 # # Завантаження + Склеювання (однією смужкою)
-# wget -q -O - $URL_LIST | pv -s $TOTAL_SIZE > "$FINAL_FILE_NAME"
+# wget -q -O --read-timeout=15 - $URL_LIST | pv -s $TOTAL_SIZE > "$FINAL_FILE_NAME"
 
 # # Перевірка статусу (pipefail гарантує помилку, якщо wget впаде)
 # if [ ${PIPESTATUS[0]} -ne 0 ]; then
@@ -52,8 +52,8 @@ echo "Початок завантаження шаблону для віртуа
 #     exit 1
 # fi
 
-wget -q --show-progress "$URL_ROCKETCHAT"
-wget -q  -O - $URL_SRC | tar -xz
+wget -q --read-timeout=15 --show-progress - "$URL_ROCKETCHAT"
+wget -q --read-timeout=15  -O - $URL_SRC | tar -xz
 
 #Перевірка чи завантажено скріпти
 if  [ ! -d src ] || [ ! -f Rocketchat.tar.gz ]; then
