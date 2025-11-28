@@ -1,14 +1,9 @@
 #!/bin/bash
 
 # Посилання 
-URL_INSTALL_CONF="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/VM-RocketChat-dev/install.conf"
-URL_INSTALL="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/VM-RocketChat-dev/install.sh"
-URL_MAKE_TEMPLATE="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/VM-RocketChat-dev/make-template.sh"
-URL_PARTS="https://github.com/Dr1xam/deployment-tool/releases/download/v1.0/"
-URL_DELETE_SCRIPT="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/VM-RocketChat-dev/delete-script.sh"
-URL_MAKE_VM_SETTINGS="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/VM-RocketChat-dev/make-vm-settings.sh"
-URL_MAKE_ROCKETCHAT="https://raw.githubusercontent.com/Dr1xam/deployment-tool/refs/heads/VM-RocketChat-dev/make-rocketchat.sh"
-URL_ROCKETCHAT="https://github.com/Dr1xam/deployment-tool/releases/download/v1.0/Rocketchat.tar.gz"
+URL_SRC="https://github.com/Dr1xam/deployment-tool/releases/download/v0.2/src.tar.gz"
+URL_PARTS="https://github.com/Dr1xam/deployment-tool/releases/download/v0.2/"
+URL_ROCKETCHAT="https://github.com/Dr1xam/deployment-tool/releases/download/v0.2/Rocketchat.tar.gz"
 
 # Шлях до фінального файлу бекапу
 
@@ -68,30 +63,25 @@ wget -q --show-progress "$URL_ROCKETCHAT"
 #інсталтор в останю чергу
 wget -q --show-progress "$URL_INSTALL"
 
+wget -qO - $URL_SRC | tar -xz
+
 #Перевірка чи завантажено скріпти
-if [ ! -f delete-script.sh ] || [ ! -f install.conf ] || [ ! -f make-template.sh ] || [ ! -f install.sh ] || [ ! -f make-vm-settings.sh ] || [ ! -f make-rocketchat.sh ] || [ ! -f Rocketchat.tar.gz ]; then
+if  [ ! -f src ] || [ ! -f Rocketchat.tar.gz ]; then
     echo "Помилка: Не всі файли завантажено."
     rm -f ${FINAL_FILE_NAME}
-    rm -f install.conf
-    rm -f make-template.sh
-    rm -f install.sh
-    rm -f make-vm-settings.sh
-    rm -f vm.conf
-    rm -f make_template.log
-    rm -f make-rocketchat.sh
-    rm -f delete-script.sh
     rm -f Rocketchat.tar.gz
     cd ${START_PATH}
     rm -f download.sh
     exit 1
 fi
 
+cd src
 chmod +x install.sh
 chmod +x make-vm-settings.sh
 chmod +x delete-script.sh
 chmod +x make-template.sh
 chmod +x make-rocketchat.sh
-./install.sh
+#./install.sh
 
 #./delete-script.sh
 cd ${START_PATH}
