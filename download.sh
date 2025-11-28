@@ -36,6 +36,10 @@ for suffix in "${SUFFIXES[@]}"; do
   URL_LIST="${URL_LIST} ${URL_PARTS}${PART_PREFIX}${suffix}"
 done
 
+TOTAL_SIZE_GB=3
+# Переводимо в байти для точності (1024*1024*1024 * 54)
+TOTAL_BYTES=$(($TOTAL_SIZE_GB * 1073741824))
+
 echo "Початок завантаження шаблону для віртуальних машин "
 
 # Вмикаємо зупинку при помилках
