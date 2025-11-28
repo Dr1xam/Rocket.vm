@@ -97,15 +97,8 @@ while kill -0 "$ARIA_PID" 2>/dev/null; do
     
     # 1. СТАБІЛЬНІ МЕТРИКИ (Оновлюються кожну 1 секунду)
     CURRENT_TIME=$(date +%s)
-    
-    # [1] БАЗА ДАНИХ (Беремо тільки байти - це найточніше джерело)
     CURRENT_BYTES=$(du -sb "$TEMP_DIR" 2>/dev/null | cut -f1)
     if [ -z "$CURRENT_BYTES" ]; then CURRENT_BYTES=0; fi
-
-    # [2] СТВОРЮЄМО HUMAN_SIZE САМОСТІЙНО (Математично з байтів)
-    # Ми ділимо байти на 1073741824 (1 GiB), щоб отримати точні Гігабайти
-    # Це гарантує, що 50% байтів завжди дорівнюватимуть половині Гігабайтів
-    HUMAN_SIZE=$(echo "scale=2; $CURRENT_BYTES / 1073741824" | bc)G
 
     # 1a. Час, що минув
     ELAPSED_TIME_SECONDS=$((CURRENT_TIME - START_TIME))
@@ -114,17 +107,13 @@ while kill -0 "$ARIA_PID" 2>/dev/null; do
     ES=$(( ELAPSED_TIME_SECONDS % 60 ))
     HUMAN_ELAPSED_TIME=$(printf "%02d:%02d:%02d" $EH $EM $ES)
 
-    # 1b. Прогрес (Рахуємо відсотки з тих самих байтів)
+    # 1b. Прогрес
     if [ "$TOTAL_BYTES" -gt 0 ]; then PERCENT=$(( 100 * CURRENT_BYTES / TOTAL_BYTES )); else PERCENT=0; fi
-    
-    # Візуальний обмежувач (щоб не було більше 100%)
     if [ "$PERCENT" -gt 100 ]; then PERCENT=100; fi
-    
-    # Малюємо смужку
     CHARS=$(( PERCENT / 5 )); BAR=""; 
     for ((i=0; i<CHARS; i++)); do BAR="${BAR}#"; done
     for ((i=CHARS; i<20; i++)); do BAR="${BAR}."; done
-    
+    HUMAN_SIZE=$(du -sh "$TEMP_DIR" 2>/dev/null | cut -f1)
 
     # 2. ВОЛАТИЛЬНІ МЕТРИКИ (Оновлюються кожні 2 секунди)
     if [ "$INTERVAL_COUNTER" -le 1 ]; then 
