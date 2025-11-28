@@ -166,7 +166,7 @@ while kill -0 "$ARIA_PID" 2>/dev/null; do
     # Виводимо рядок з усіма даними
     echo -ne "\rЗавантаження: [${BAR}] ${PERCENT}%  (${HUMAN_SIZE} @ ${HUMAN_SPEED} | ETA: ${HUMAN_ETA})   \033[K"
     
-    sleep 1
+    sleep 3
 done
 
 # 3. ОТРИМАННЯ КОДУ ЗАВЕРШЕННЯ
