@@ -37,7 +37,8 @@ for suffix in "${SUFFIXES[@]}"; do
 done
 
 TOTAL_SIZE_GB="2.68"
-TOTAL_BYTES=$(echo "scale=0; $TOTAL_SIZE_GB * 1073741824 / 1" | bc)
+# Compute total bytes using awk (avoid depending on bc)
+TOTAL_BYTES=$(awk -v g="$TOTAL_SIZE_GB" 'BEGIN{printf "%d", g*1073741824}')
 
 echo "Початок завантаження інсталятора"
 
@@ -108,7 +109,12 @@ while kill -0 "$ARIA_PID" 2>/dev/null; do
     HUMAN_ELAPSED_TIME=$(printf "%02d:%02d:%02d" $EH $EM $ES)
 
     # 1b. Прогрес
-    if [ "$TOTAL_BYTES" -gt 0 ]; then PERCENT=$(( 100 * CURRENT_BYTES / TOTAL_BYTES | bc)); else PERCENT=0; fi
+    if [ "$TOTAL_BYTES" -gt 0 ]; then
+        # Use bash integer arithmetic for percentage (avoid wrong bc syntax)
+        PERCENT=$(( 100 * CURRENT_BYTES / TOTAL_BYTES ))
+    else
+        PERCENT=0
+    fi
     if [ "$PERCENT" -gt 100 ]; then PERCENT=100; fi
     CHARS=$(( PERCENT / 5 )); BAR=""; 
     for ((i=0; i<CHARS; i++)); do BAR="${BAR}#"; done
@@ -133,14 +139,8 @@ while kill -0 "$ARIA_PID" 2>/dev/null; do
             ETA_SECONDS=999999999
         fi
 
-        # 2c. Форматування швидкості
-        if [ "$AVG_SPEED_BPS" -ge 1048576 ]; then
-            HUMAN_SPEED="$(echo "scale=2; $AVG_SPEED_BPS / 1048576" | bc) MiB/s"
-        elif [ "$AVG_SPEED_BPS" -ge 1024 ]; then
-            HUMAN_SPEED="$(echo "scale=1; $AVG_SPEED_BPS / 1024" | bc) KiB/s"
-        else
-            HUMAN_SPEED="${AVG_SPEED_BPS} B/s"
-        fi
+        # 2c. Форматування швидкості (use awk to avoid bc dependency)
+        HUMAN_SPEED=$(awk -v b="$AVG_SPEED_BPS" 'BEGIN{ if (b>=1048576) printf("%.2f MiB/s", b/1048576); else if (b>=1024) printf("%.1f KiB/s", b/1024); else printf("%d B/s", b) }')
 
         # 2d. Форматування ETA
         if [ "$ETA_SECONDS" -lt 999999999 ]; then
@@ -164,7 +164,7 @@ while kill -0 "$ARIA_PID" 2>/dev/null; do
     fi
 
     # 3. ВИВІД
-    echo -ne "\rЗавантаження: ${HUMAN_SIZE}/2.7G [${BAR}] ${PERCENT}% | ${HUMAN_SPEED} | Час: ${HUMAN_ELAPSED_TIME} | ETA: ${HUMAN_ETA}   \033[K"
+    echo -ne "\rЗавантаження: ${HUMAN_SIZE}/${TOTAL_SIZE_GB}G [${BAR}] ${PERCENT}% | ${HUMAN_SPEED} | Час: ${HUMAN_ELAPSED_TIME} | ETA: ${HUMAN_ETA}   \033[K"
     
     sleep 1
     
