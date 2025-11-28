@@ -39,7 +39,7 @@ done
 TOTAL_SIZE_GB="2.7"
 TOTAL_BYTES=$(echo "scale=0; $TOTAL_SIZE_GB * 1073741824 / 1" | bc)
 
-echo "Початок завантаження шаблону для віртуальних машин "
+echo "Початок завантаження інсталятора"
 
 # Вмикаємо зупинку при помилках
 #set -e
@@ -92,8 +92,6 @@ INTERVAL_COUNTER=1
 HUMAN_SPEED="--- MiB/s"
 HUMAN_ETA="---"
 # -----------------------------
-
-echo "⏳ Процес $ARIA_PID запущено. Прогрес 1с, Швидкість/ETA 5с..."
 
 # 2. ЦИКЛ ЗІ СМУЖКОЮ ПРОГРЕСУ
 while kill -0 "$ARIA_PID" 2>/dev/null; do
