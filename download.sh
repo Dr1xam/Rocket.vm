@@ -72,7 +72,7 @@ echo "  out=src_code.tar.gz" >> "$ARIA_INPUT"
 # -x 4: по 4 потоки на файл
 # --summary-interval=1: оновлювати статус щосекунди (красивий вивід)
 
-if ! aria2c -i "$ARIA_INPUT" -d "$TEMP_DIR" -j 5 -x 4 -s 4 --summary-interval=1 --console-log-level=warn; then
+if ! aria2c -i "$ARIA_INPUT" -d "$TEMP_DIR" -j 5 -x 4 -s 4 --summary-interval=1 ; then
     echo "Помилка завантаження файлів!"
     rm -rf "$TEMP_DIR"
     rm -f "$FINAL_FILE_NAME"
