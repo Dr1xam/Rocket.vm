@@ -108,7 +108,6 @@ if [ ! -d "src" ] || [ ! -f "Rocketchat.tar.gz" ] || [ ! -s "$FINAL_FILE_NAME" ]
     rm -rf src
     
     cd "${START_PATH}"
-    rm -f download.sh
     exit 1
 fi
 
