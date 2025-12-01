@@ -6,6 +6,7 @@ set -o pipefail
 
 # qmrestore розпаковує архів у віртуальну машину
 # Запускаємо qmrestore
+cd ..
 qmrestore "$UBUNTU_BACKUP_TEMPLATE_NAME" "$TEMPLATE_VM_ID" --storage "$VM_TARGET_STORAGE" --unique --force 2>&1 | \
 while IFS= read -r line; do
     case "$line" in
@@ -39,6 +40,8 @@ qm set "$TEMPLATE_VM_ID" --name deploy-template &> /dev/null
 
 # (Опційно) Видалити великий склеєний файл, щоб звільнити місце
 #rm -f "$UBUNTU_BACKUP_TEMPLATE_NAME"
+
+cd src
 
 
 
