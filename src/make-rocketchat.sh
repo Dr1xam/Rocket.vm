@@ -94,7 +94,7 @@ echo -e "\nVM $ROCKETCHAT_VM_ID (rocketchat) завантажена! (Час з�
 
 #Встановлення рокетчату
 set -o pipefail
-
+cd ..
 # Перевірка наявності архіву
 if [ ! -f "$ROCKETCHAT_ARCHIVE_NAME" ]; then
     echo "Помилка: Файл $ROCKETCHAT_ARCHIVE_NAME не знайдено!"
@@ -103,7 +103,7 @@ fi
 
 echo "Вcтановлення Rocketсhat на VM $ROCKETCHAT_VM_ID (rocketchat)"
 
-cd..
+
 # 1. ЗАПУСКАЄМО ВЕБ-СЕРВЕР (з захистом cleanup)
 python3 -m http.server 8888 > /dev/null 2>&1 &
 SERVER_PID=$!
