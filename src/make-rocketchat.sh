@@ -103,6 +103,7 @@ fi
 
 echo "Вcтановлення Rocketсhat на VM $ROCKETCHAT_VM_ID (rocketchat)"
 
+cd..
 # 1. ЗАПУСКАЄМО ВЕБ-СЕРВЕР (з захистом cleanup)
 python3 -m http.server 8888 > /dev/null 2>&1 &
 SERVER_PID=$!
