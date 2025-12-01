@@ -1,14 +1,5 @@
 source vm.conf
-rm -f make-template.sh
-rm -f install.sh
+cd ..
 rm -f ${UBUNTU_BACKUP_TEMPLATE_NAME}
-rm -f install.conf
-rm -f make-vm-settings.sh
-rm -f vm.conf
-rm -f make_template.log
-rm -f make-rocketchat.sh
-rm -f deploy_rocketchat_vm.log
 rm -f Rocketchat.tar.gz
-rm -f deploy_rocketchat.log
-
-rm -f delete-script.sh
+rm -rf src
