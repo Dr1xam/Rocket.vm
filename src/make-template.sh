@@ -41,6 +41,8 @@ qm set "$TEMPLATE_VM_ID" --name deploy-template &> /dev/null
 # (Опційно) Видалити великий склеєний файл, щоб звільнити місце
 #rm -f "$UBUNTU_BACKUP_TEMPLATE_NAME"
 
+cd src
+
 
 
 
