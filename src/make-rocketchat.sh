@@ -37,6 +37,8 @@ fi
 # 2. НАЛАШТУВАННЯ (Швидкий процес)
 
 # Тут ми просто пишемо все в лог, щоб не смітити на екрані
+qm set "$ROCKETCHAT_VM_ID" --ide2 local-lvm:cloudinit
+
 qm set "$ROCKETCHAT_VM_ID" \
   --memory "$ROCKETCHAT_VM_RAM" \
   --cores "$ROCKETCHAT_VM_CORES" \
