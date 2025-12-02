@@ -37,14 +37,15 @@ fi
 # 2. НАЛАШТУВАННЯ (Швидкий процес)
 
 # Тут ми просто пишемо все в лог, щоб не смітити на екрані
-qm set "$ROCKETCHAT_VM_ID" \
+  qm set "$ROCKETCHAT_VM_ID" \
   --memory "$ROCKETCHAT_VM_RAM" \
   --cores "$ROCKETCHAT_VM_CORES" \
   --cpu cputype=host \
   --net0 virtio,bridge="$ROCKETCHAT_VM_BRIDGE" \
   --ipconfig0 ip="$ROCKETCHAT_VM_IP",gw="$GATEWAY" \
   --nameserver "$ROCKETCHAT_VM_DNS" \
-  --onboot 1 >> "$DEPLOY_ROCKETCHAT_VM_LOG_FILE" 2>&1
+  --onboot 1 \
+  **--agent 1** >> "$DEPLOY_ROCKETCHAT_VM_LOG_FILE" 2>&1
 
 if [ $? -ne 0 ]; then
     echo "ПОМИЛКА"
